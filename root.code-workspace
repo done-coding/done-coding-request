@@ -1,11 +1,11 @@
 {
   "folders": [
     {
-      "name": "template-monorepo",
+      "name": "@done-coding/request",
       "path": "."
     },
     {
-      "name": "sub-package-ts",
+      "name": "@done-coding/request-base",
       "path": "packages/sub-package-ts"
     }
   ],
