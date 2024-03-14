@@ -1,5 +1,5 @@
 {
-  "name": "template-monorepo",
+  "name": "@done-coding/request",
   "version": "0.0.1",
   "private": true,
   "description": "monorepo",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/justsosu/template-monorepo"
+    "url": "https://gitee.com/justsosu/reuqest"
   },
   "author": "JustSoSu",
   "license": "ISC",

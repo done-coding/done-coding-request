@@ -1,5 +1,5 @@
 {
-  "name": "template-monorepo_sub-package-ts",
+  "name": "@done-coding/request-base",
   "version": "0.0.1",
   "description": "ts子包",
   "main": "lib/index.js",
