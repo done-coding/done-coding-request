@@ -1,7 +1,7 @@
 {
   "name": "@done-coding/request-base",
   "version": "0.0.1",
-  "description": "ts子包",
+  "description": "请求基本配置",
   "main": "lib/index.js",
   "module": "es/index.js",
   "types": "types/index.d.ts",
@@ -41,7 +41,6 @@
   },
   "sideEffects": [],
   "dependencies": {
-    "get-hash-val": "0.0.3-0",
     "lodash": "^4.17.21"
   }
 }

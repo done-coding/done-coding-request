@@ -51,11 +51,82 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
 
+  packages/axios:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/lodash':
+        specifier: ^4.14.198
+        version: 4.14.202
+      '@types/qs':
+        specifier: ^6.9.9
+        version: 6.9.11
+      '@vitest/coverage-istanbul':
+        specifier: ^1.1.1
+        version: 1.1.1(vitest@1.1.1)
+      csstype:
+        specifier: ^3.1.2
+        version: 3.1.3
+      jsdom:
+        specifier: ^23.0.1
+        version: 23.2.0
+      rimraf:
+        specifier: ^5.0.1
+        version: 5.0.5
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.10
+        version: 5.0.10(@types/node@18.19.4)
+      vite-plugin-dts:
+        specifier: ^3.7.0
+        version: 3.7.0(@types/node@18.19.4)(typescript@5.3.3)(vite@5.0.10)
+      vitest:
+        specifier: ^1.1.1
+        version: 1.1.1(@types/node@18.19.4)(jsdom@23.2.0)
+
   packages/base:
     dependencies:
-      get-hash-val:
-        specifier: 0.0.3-0
-        version: 0.0.3-0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/lodash':
+        specifier: ^4.14.198
+        version: 4.14.202
+      '@types/qs':
+        specifier: ^6.9.9
+        version: 6.9.11
+      '@vitest/coverage-istanbul':
+        specifier: ^1.1.1
+        version: 1.1.1(vitest@1.1.1)
+      csstype:
+        specifier: ^3.1.2
+        version: 3.1.3
+      jsdom:
+        specifier: ^23.0.1
+        version: 23.2.0
+      rimraf:
+        specifier: ^5.0.1
+        version: 5.0.5
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.10
+        version: 5.0.10(@types/node@18.19.4)
+      vite-plugin-dts:
+        specifier: ^3.7.0
+        version: 3.7.0(@types/node@18.19.4)(typescript@5.3.3)(vite@5.0.10)
+      vitest:
+        specifier: ^1.1.1
+        version: 1.1.1(@types/node@18.19.4)(jsdom@23.2.0)
+
+  packages/uni:
+    dependencies:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1893,11 +1964,6 @@ packages:
       acorn: 8.10.0
     dev: true
 
-  /acorn-walk@8.2.0:
-    resolution: {integrity: sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==}
-    engines: {node: '>=0.4.0'}
-    dev: true
-
   /acorn-walk@8.3.1:
     resolution: {integrity: sha512-TgUZgYvqZprrl7YldZNoa9OciCAyZR+Ejm9eXzKCmjsF5IKp/wgQ7Z/ZpjpGTIUPwrHQIcYeI8qDh4PsEwxMbw==}
     engines: {node: '>=0.4.0'}
@@ -2424,10 +2490,6 @@ packages:
       delayed-stream: 1.0.0
     dev: true
 
-  /comlink@4.4.1:
-    resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
-    dev: false
-
   /commander@9.5.0:
     resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
     engines: {node: ^12.20.0 || >=14}
@@ -2755,10 +2817,6 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
-
-  /crypto-js@4.2.0:
-    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
-    dev: false
 
   /css-tree@2.3.1:
     resolution: {integrity: sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==}
@@ -3459,16 +3517,6 @@ packages:
   /get-func-name@2.0.2:
     resolution: {integrity: sha512-8vXOvuE167CtIc3OyItco7N/dpRtBbYOsPsXCz7X/PMnlGjYjSGuZJgM1Y7mmew7BKf9BqvLX2tnOVy1BBUsxQ==}
     dev: true
-
-  /get-hash-val@0.0.3-0:
-    resolution: {integrity: sha512-j1YEb6MFoi2ZopXP47KnC6a3/UUIZgpA0PjyJ6feY3S4tL7JUxHYNomqCW6lxSG9nA1fU6EObeNX1+NZmdGQKA==}
-    engines: {node: '>=16.0.0'}
-    dependencies:
-      comlink: 4.4.1
-      crypto-js: 4.2.0
-      magic-bytes.js: 1.7.0
-      umd-blob-url: 0.0.2-alpha.7
-    dev: false
 
   /get-pkg-repo@4.2.1:
     resolution: {integrity: sha512-2+QbHjFRfGB74v/pYWjd5OhU3TDIC2Gv/YKUTk/tCvAz0pkn/Mz6P3uByuBimLOcPvN2jYdScl3xGFSrx0jEcA==}
@@ -4637,10 +4685,6 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
     dev: true
-
-  /magic-bytes.js@1.7.0:
-    resolution: {integrity: sha512-YzVU2+/hrjwx8xcgAw+ffNq3jkactpj+f1iSL4LonrFKhvnwDzHSqtFdk/MMRP53y9ScouJ7cKEnqYsJwsHoYA==}
-    dev: false
 
   /magic-string@0.30.5:
     resolution: {integrity: sha512-7xlpfBaQaP/T6Vh8MO/EqXSW5En6INHEvEXQiuff7Gku0PWjU3uf6w/j9o7O+SpB5fOAkrI5HeoNgwjEO0pFsA==}
@@ -6553,7 +6597,7 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       psl: 1.9.0
-      punycode: 2.3.0
+      punycode: 2.3.1
       universalify: 0.2.0
       url-parse: 1.5.10
     dev: true
@@ -6605,7 +6649,7 @@ packages:
       '@tsconfig/node16': 1.0.4
       '@types/node': 16.18.58
       acorn: 8.10.0
-      acorn-walk: 8.2.0
+      acorn-walk: 8.3.1
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
@@ -6724,14 +6768,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /umd-blob-url@0.0.2-alpha.7:
-    resolution: {integrity: sha512-k0ULnqbzuXsPYN/5O9zs0XqTFmMgA9yIkCxS+f0xggFNTgW1cxaF8exG235/GErLJKyNfNrk+FSJVuNMs8EXpg==}
-    engines: {node: '>=16.0.0'}
-    dependencies:
-      comlink: 4.4.1
-      crypto-js: 4.2.0
-    dev: false
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}

@@ -6,7 +6,15 @@
     },
     {
       "name": "@done-coding/request-base",
-      "path": "packages/sub-package-ts"
+      "path": "packages/base"
+    },
+    {
+      "name": "@done-coding/request-uni",
+      "path": "packages/uni"
+    },
+    {
+      "name": "@done-coding/request-axios",
+      "path": "packages/axios"
     }
   ],
   "settings": {
