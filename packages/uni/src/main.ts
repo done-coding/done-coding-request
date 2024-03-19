@@ -8,6 +8,8 @@ import {
 import { createRequest as createRequestBase } from "@done-coding/request-base";
 import _omit from "lodash/omit";
 
+export * from "@done-coding/request-base";
+
 export const createRequest = ({
   basePath,
   timeout,
@@ -54,7 +56,62 @@ export const createRequest = ({
           success,
           fail,
         });
-      }).then((res) => dispatchBusinessResult(res, otherOpt));
+      })
+        .then((res) => dispatchBusinessResult(res, otherOpt))
+        .catch((err) => {
+          const {
+            errMsg: message,
+            errno,
+            errCode,
+            errNo,
+            error,
+          } = err as UniApp.GeneralCallbackResult & {
+            /**
+             * 微信未来标准code
+             */
+            errno?: number;
+            /**
+             * 微信已存在code
+             */
+            errCode?: number;
+
+            /**
+             * 抖音小程序标准错误码
+             */
+            errNo?: number;
+
+            /**
+             * 支付宝小程序标准错误码
+             */
+            error?: number;
+          };
+          let code: RequestFailResult["code"];
+          // https://developers.weixin.qq.com/miniprogram/dev/framework/usability/PublicErrno.html
+          // #ifdef MP-WEIXIN
+          code = errno ?? errCode ?? InnerErrorCode.NO_CODE;
+
+          // #endif
+
+          // #ifdef MP-TOUTIAO
+          code = errNo ?? InnerErrorCode.NO_CODE;
+          // #endif
+
+          // #ifdef MP-ALIPAY
+          code = error ?? InnerErrorCode.NO_CODE;
+          // #endif
+
+          // #ifndef MP-WEIXIN || MP-TOUTIAO || MP-ALIPAY
+          code = errno || errCode || errNo || error || InnerErrorCode.NO_CODE;
+          // #endif
+
+          const errorInfo: RequestFailResult = {
+            code,
+            message,
+            isBusinessError: false,
+            cause: err,
+          };
+          return Promise.reject(errorInfo);
+        });
     },
   });
 

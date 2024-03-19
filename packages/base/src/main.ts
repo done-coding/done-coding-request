@@ -13,17 +13,39 @@ export interface RequestResult<D> {
 export enum InnerErrorCode {
   /** 请求出错 */
   REQUEST_ERROR = "REQUEST_ERROR",
+  /** 未响应 */
+  NO_RESPONSE = "NO_RESPONSE",
+  /** 分发响应结果执行出错 */
+  DISPATCH_RESPONSE = "DISPATCH_RESPONSE",
+  /** 处理RequestFailResult错误时出错 */
+  DEAL_ERROR = "DEAL_ERROR",
+  /** 无错误码 */
+  NO_CODE = "NO_CODE",
 }
 
-/** 请求失败结果 */
-export interface RequestFailResult {
+interface RequestFailResultBase {
   code: number | InnerErrorCode;
   message: string;
   /** 是否业务出错  */
   isBusinessError: boolean;
-  /** 原因 */
-  cause?: unknown;
 }
+
+/** 网络错误 */
+interface RequestFailResultNetwork extends RequestFailResultBase {
+  isBusinessError: false;
+  /** 失败原因 */
+  cause: unknown;
+}
+
+/** 业务错误 */
+interface RequestFailResultBusiness extends RequestFailResultBase {
+  isBusinessError: true;
+}
+
+/** 请求失败结果 */
+export type RequestFailResult =
+  | RequestFailResultNetwork
+  | RequestFailResultBusiness;
 
 /**
  * 请求ui配置
@@ -111,6 +133,28 @@ export interface Options<C extends ApiConfigBase, R>
   showToast: (message: string, show: boolean) => void;
 }
 
+/** dealError错误捕捉 */
+// !!!所有外部传入的function都需要try catch
+export const catchDealError = (
+  fn: () => DealErrorResult | Promise<DealErrorResult>,
+): DealErrorResult | Promise<DealErrorResult> => {
+  try {
+    return fn();
+  } catch (error) {
+    const errorInfo: RequestFailResult = {
+      code: InnerErrorCode.DEAL_ERROR,
+      message: "处理RequestFailResult错误时出错",
+      isBusinessError: false,
+      cause: error,
+    };
+    return {
+      canShowErrorToast: true,
+      newError: errorInfo,
+      reload: false,
+    };
+  }
+};
+
 export class Request<C extends ApiConfigBase, R> {
   private options: Options<C, R>;
 
@@ -163,9 +207,8 @@ export class Request<C extends ApiConfigBase, R> {
       const res = await this.issue<D>(config, extendConfig);
       return res;
     } catch (error) {
-      const { newError, reload, canShowErrorToast } = await this.dealError(
-        error as RequestFailResult,
-        extendConfig,
+      const { newError, reload, canShowErrorToast } = await catchDealError(() =>
+        this.dealError(error as RequestFailResult, extendConfig),
       );
       if (reload) {
         return this.request(apiConfig);
@@ -188,7 +231,7 @@ export const createRequest = <C extends ApiConfigBase, R>(
 };
 
 /** 分发业务结果 */
-export const dispatchBusinessResult = <R, D = unknown>(
+export const dispatchBusinessResult = <R, D = any>(
   res: R,
   {
     getBusinessCode,
@@ -197,20 +240,31 @@ export const dispatchBusinessResult = <R, D = unknown>(
     businessSuccessCodeList,
   }: BusinessOptions<R>,
 ): RequestResult<D> | Promise<RequestResult<D>> => {
-  const code = getBusinessCode(res);
-  const message = getBusinessMsg(res);
-  if (businessSuccessCodeList.includes(code)) {
-    const info: RequestResult<D> = {
-      code,
-      data: getBusinessData(res),
-      message,
-    };
-    return info;
-  } else {
+  try {
+    // !!!所有外部传入的function都需要try catch
+    const code = getBusinessCode(res);
+    const message = getBusinessMsg(res);
+    if (businessSuccessCodeList.includes(code)) {
+      const info: RequestResult<D> = {
+        code,
+        data: getBusinessData(res),
+        message,
+      };
+      return info;
+    } else {
+      const errorInfo: RequestFailResult = {
+        code,
+        message,
+        isBusinessError: true,
+      };
+      return Promise.reject(errorInfo);
+    }
+  } catch (error) {
     const errorInfo: RequestFailResult = {
-      code,
-      message,
-      isBusinessError: true,
+      code: InnerErrorCode.DISPATCH_RESPONSE,
+      message: "分发响应结果执行出错",
+      isBusinessError: false,
+      cause: error,
     };
     return Promise.reject(errorInfo);
   }
