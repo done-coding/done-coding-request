@@ -1,8 +1,5 @@
 import _assign from "lodash/assign";
 
-/** 请求方法 */
-type Method = "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS" | "HEAD";
-
 /** 请求结果 */
 export interface RequestResult<D> {
   code: number;
@@ -10,101 +7,22 @@ export interface RequestResult<D> {
   message: string;
 }
 
+/**
+ * 内部错误码
+ */
+export enum InnerErrorCode {
+  /** 请求出错 */
+  REQUEST_ERROR = "REQUEST_ERROR",
+}
+
 /** 请求失败结果 */
 export interface RequestFailResult {
-  code: number;
+  code: number | InnerErrorCode;
   message: string;
   /** 是否业务出错  */
   isBusinessError: boolean;
-}
-
-/** api配置选项 */
-export interface ApiConfig {
-  /** 请求地址 */
-  url: string;
-  /** 请求方法 */
-  method: Method;
-  /** 请求数据主体 */
-  data?: unknown;
-  /** 请求query参数 */
-  params?: Record<string, string>;
-  /** 超时时间 */
-  timeout?: number;
-  /** 请求头 */
-  headers?: Record<string, string>;
-}
-
-export interface IssueConfig extends ApiConfig {
-  /** 根路径 */
-  basePath: string;
-  /** 超时时间 */
-  timeout: number;
-}
-
-/** 处理错误结果 */
-export interface DealErrorResult {
-  /** 可以展示错误提示 */
-  canShowErrorToast: boolean;
-  /** 重新请求 */
-  reload?: boolean;
-  /** 新的错误 */
-  newError: RequestFailResult;
-}
-
-/** request 选项 */
-interface Options<
-  RC extends Record<string, unknown> = Record<string, unknown>,
-> {
-  /** 根路径 */
-  basePath: string;
-  /** 超时时间 */
-  timeout: number;
-  /** ui配置 */
-  uiConfig: RequestUiConfig;
-  /** 请求配置 */
-  request: {
-    /** 获取请求头 */
-    getHeaders?: () => Record<string, string>;
-    /** 处理请求报文 */
-    before?: (requestConfig: RC) => Promise<RC>;
-  };
-  /** 响应配置 */
-  response: {
-    /** 网络 */
-    network: {
-      /** 成功状态码列表 【如果不设置 则直接认为都成功 !!!比如小程序】 */
-      successCodeList?: number[];
-      /** 获取响应状态码 */
-      getCode: (response: any) => number;
-      /** 获取响应信息 */
-      getMsg: (response: any) => string;
-      /** 处理网络错误 */
-      dealError: (
-        currentError: RequestFailResult,
-        uiConfig: RequestUiConfig,
-      ) => Promise<DealErrorResult>;
-    };
-    /** 业务 */
-    business: {
-      /** 成功状态码列表 */
-      successCodeList: number[];
-      /** 获取业务状态码 */
-      getCode: (response: any) => number;
-      /** 获取业务信息 */
-      getMsg: (response: any) => string;
-      /** 获取后端返回的数据主体 */
-      getData: (response: any) => any;
-      /** 处理业务错误 */
-      dealError: (
-        currentError: RequestFailResult,
-        uiConfig: RequestUiConfig,
-      ) => Promise<DealErrorResult>;
-    };
-  };
-  issue: <D>(
-    config: IssueConfig,
-    uiConfig: RequestUiConfig,
-  ) => Promise<RequestResult<D>>;
+  /** 原因 */
+  cause?: unknown;
 }
 
 /**
@@ -117,20 +35,87 @@ export interface RequestUiConfig {
   errorToast?: boolean;
 }
 
-export interface XApiConfig extends ApiConfig {
+/** 拓展配置 */
+export interface ExtendConfig {
   /** 请求ui配置 */
   uiConfig?: RequestUiConfig;
 }
 
-export class Request {
-  private options: Options;
+export type ApiConfigBase = Record<string, any>;
+
+/** api配置选项 */
+export type ApiConfig<C extends ApiConfigBase> = C & ExtendConfig;
+
+/** 发起请求选项 */
+export type IssueConfig<C extends ApiConfigBase> = C & {
+  BASE_PATH: string;
+  TIMEOUT: number;
+};
+
+/** 业务配置项 */
+export interface BusinessOptions<R> {
+  /** 获取业务状态码 */
+  getBusinessCode: (res: R) => number;
+  /** 获取业务信息 */
+  getBusinessMsg: (res: R) => string;
+  /** 获取业务数据 */
+  getBusinessData: <D = unknown>(res: R) => D;
+  /** 业务成功状态码列表 */
+  businessSuccessCodeList: number[];
+}
+
+/** 网络配置项 */
+export interface NetworkOptions {
+  /** 获取网络状态码 */
+  getNetworkCode: (res: unknown) => number;
+  /** 获取网络信息 */
+  getNetworkMsg: (res: unknown) => string;
+}
+
+/** 处理错误结果 */
+export interface DealErrorResult {
+  /** 可以展示错误提示 */
+  canShowErrorToast: boolean;
+  /** 重新请求 */
+  reload?: boolean;
+  /** 新的错误 */
+  newError: RequestFailResult;
+}
+
+/** 请求相关hook */
+export interface RequestHook<C extends ApiConfigBase> {
+  beforeRequest?: (
+    config: IssueConfig<C>,
+  ) => IssueConfig<C> | Promise<IssueConfig<C>>;
+}
+
+/** request 选项 */
+export interface Options<C extends ApiConfigBase, R>
+  extends BusinessOptions<R>,
+    ExtendConfig {
+  /** 根路径 */
+  basePath: string;
+  /** 超时时间 */
+  timeout: number;
+  /** 发起请求的方法 */
+  issue: <D>(
+    config: IssueConfig<C>,
+    extendConfig: ExtendConfig,
+  ) => Promise<RequestResult<D>>;
+  /** 处理错误 */
+  dealError: (
+    currentError: RequestFailResult,
+    extendConfig: ExtendConfig,
+  ) => Promise<DealErrorResult>;
+  /** 展示提示 show: 是否展示 */
+  showToast: (message: string, show: boolean) => void;
+}
+
+export class Request<C extends ApiConfigBase, R> {
+  private options: Options<C, R>;
 
   private get basePath() {
     return this.options.basePath;
-  }
-
-  private get headers() {
-    return this.options.request.getHeaders?.() || {};
   }
 
   private get timeout() {
@@ -138,133 +123,57 @@ export class Request {
   }
 
   private get uiConfig() {
-    return this.options.uiConfig;
+    return this.options.uiConfig || {};
   }
 
   private get issue() {
     return this.options.issue;
   }
 
-  private get networkSuccessCodeList() {
-    return this.options.response.network.successCodeList;
+  private get dealError() {
+    return this.options.dealError;
   }
 
-  private get networkGetCode() {
-    return this.options.response.network.getCode;
+  private get showToast() {
+    return this.options.showToast;
   }
 
-  private get networkGetMsg() {
-    return this.options.response.network.getMsg;
-  }
-
-  private get networkDealError() {
-    return this.options.response.network.dealError;
-  }
-
-  private get businessSuccessCodeList() {
-    return this.options.response.business.successCodeList;
-  }
-
-  private get businessGetCode() {
-    return this.options.response.business.getCode;
-  }
-
-  private get businessGetMsg() {
-    return this.options.response.business.getMsg;
-  }
-
-  private get businessGetData() {
-    return this.options.response.business.getData;
-  }
-
-  private get businessDealError() {
-    return this.options.response.business.dealError;
-  }
-
-  public constructor(opt: Options) {
+  public constructor(opt: Options<C, R>) {
     this.options = opt;
   }
 
   public request = async <D>(
-    apiConfig: XApiConfig,
+    apiConfig: ApiConfig<C>,
   ): Promise<RequestResult<D>> => {
-    const {
-      url,
-      method,
-      timeout = this.timeout,
-      headers = {},
-      uiConfig = {},
-    } = apiConfig;
-
-    const headersFinal = _assign({}, this.headers, headers);
+    const { uiConfig = {}, ...otherXApiConfig } = apiConfig;
 
     const uiConfigFinal = _assign({}, this.uiConfig, uiConfig);
 
-    const config: IssueConfig = {
-      url,
-      method,
-      params: apiConfig.params,
-      data: apiConfig.data,
-      timeout,
-      headers: headersFinal,
-      basePath: this.basePath,
+    const extendConfig: ExtendConfig = {
+      uiConfig: uiConfigFinal,
+    };
+
+    const config: IssueConfig<C> = {
+      ...(otherXApiConfig as C),
+      BASE_PATH: this.basePath,
+      TIMEOUT: this.timeout,
     };
 
     try {
-      const res = await this.issue(config, uiConfigFinal);
-
-      const networkCode = this.networkGetCode(res);
-
-      const { networkSuccessCodeList } = this;
-      // 如果不是成功状态码 转网络失败 被下方catch捕获
-      if (
-        networkSuccessCodeList &&
-        !networkSuccessCodeList.includes(networkCode)
-      ) {
-        throw res;
-      }
-
-      const code = this.businessGetCode(res);
-      const message = this.businessGetMsg(res);
-      if (this.businessSuccessCodeList.includes(code)) {
-        const resFinal: RequestResult<D> = {
-          code,
-          message,
-          data: this.businessGetData(res),
-        };
-        return resFinal;
-      } else {
-        const errorFinal: RequestFailResult = {
-          code,
-          message,
-          isBusinessError: true,
-        };
-        const { newError, reload } = await this.businessDealError(
-          errorFinal,
-          uiConfigFinal,
-        );
-        if (reload) {
-          return this.request(apiConfig);
-        } else {
-          return Promise.reject(newError);
-        }
-      }
+      const res = await this.issue<D>(config, extendConfig);
+      return res;
     } catch (error) {
-      const code = this.networkGetCode(error);
-      const message = this.networkGetMsg(error);
-
-      const errorFinal: RequestFailResult = {
-        code,
-        message,
-        isBusinessError: false,
-      };
-      const { newError, reload } = await this.networkDealError(
-        errorFinal,
-        uiConfigFinal,
+      const { newError, reload, canShowErrorToast } = await this.dealError(
+        error as RequestFailResult,
+        extendConfig,
       );
       if (reload) {
         return this.request(apiConfig);
       } else {
+        this.showToast(
+          newError.message,
+          canShowErrorToast && (uiConfigFinal.errorToast ?? true),
+        );
         return Promise.reject(newError);
       }
     }
@@ -272,6 +181,51 @@ export class Request {
 }
 
 /** 创建请求实例 */
-export const createRequest = (opt: Options) => {
-  return new Request(opt);
+export const createRequest = <C extends ApiConfigBase, R>(
+  opt: Options<C, R>,
+) => {
+  return new Request<C, R>(opt);
+};
+
+/** 分发业务结果 */
+export const dispatchBusinessResult = <R, D = unknown>(
+  res: R,
+  {
+    getBusinessCode,
+    getBusinessMsg,
+    getBusinessData,
+    businessSuccessCodeList,
+  }: BusinessOptions<R>,
+): RequestResult<D> | Promise<RequestResult<D>> => {
+  const code = getBusinessCode(res);
+  const message = getBusinessMsg(res);
+  if (businessSuccessCodeList.includes(code)) {
+    const info: RequestResult<D> = {
+      code,
+      data: getBusinessData(res),
+      message,
+    };
+    return info;
+  } else {
+    const errorInfo: RequestFailResult = {
+      code,
+      message,
+      isBusinessError: true,
+    };
+    return Promise.reject(errorInfo);
+  }
+};
+
+/** 回调请求转Promise */
+export const callback2Promise = <S, E>(
+  fn: (res: { success: (res: S) => void; fail: (res: E) => void }) => unknown,
+): Promise<S> => {
+  return new Promise((resolve, reject) => {
+    const success = (res: S) => resolve(res);
+    const fail = (res: E) => reject(res);
+    fn({
+      success,
+      fail,
+    });
+  });
 };

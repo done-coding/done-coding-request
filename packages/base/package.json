@@ -22,8 +22,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/justsosu/template-monorepo",
-    "directory": "packages/sub-package-ts"
+    "url": "https://gitee.com/justsosu/request",
+    "directory": "packages/base"
   },
   "author": "JustSoSu",
   "license": "ISC",

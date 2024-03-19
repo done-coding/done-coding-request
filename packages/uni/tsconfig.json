@@ -5,7 +5,7 @@
     "lib": ["ES2020"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["vitest/globals"],
+    "types": ["@dcloudio/types", "vitest/globals"],
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
