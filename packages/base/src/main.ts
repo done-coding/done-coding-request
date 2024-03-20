@@ -1,51 +1,19 @@
 import _assign from "lodash/assign";
 
+import type { RequestFailResult } from "./error";
+import {
+  RequestFailResultNetwork,
+  RequestFailResultBusiness,
+  InnerErrorCode,
+  RequestFailResultBase,
+} from "./error";
+
 /** 请求结果 */
 export interface RequestResult<D> {
   code: number;
   data: D;
   message: string;
 }
-
-/**
- * 内部错误码
- */
-export enum InnerErrorCode {
-  /** 请求出错 */
-  REQUEST_ERROR = "REQUEST_ERROR",
-  /** 未响应 */
-  NO_RESPONSE = "NO_RESPONSE",
-  /** 分发响应结果执行出错 */
-  DISPATCH_RESPONSE = "DISPATCH_RESPONSE",
-  /** 处理RequestFailResult错误时出错 */
-  DEAL_ERROR = "DEAL_ERROR",
-  /** 无错误码 */
-  NO_CODE = "NO_CODE",
-}
-
-interface RequestFailResultBase {
-  code: number | InnerErrorCode;
-  message: string;
-  /** 是否业务出错  */
-  isBusinessError: boolean;
-}
-
-/** 网络错误 */
-interface RequestFailResultNetwork extends RequestFailResultBase {
-  isBusinessError: false;
-  /** 失败原因 */
-  cause: unknown;
-}
-
-/** 业务错误 */
-interface RequestFailResultBusiness extends RequestFailResultBase {
-  isBusinessError: true;
-}
-
-/** 请求失败结果 */
-export type RequestFailResult =
-  | RequestFailResultNetwork
-  | RequestFailResultBusiness;
 
 /**
  * 请求ui配置
@@ -128,7 +96,7 @@ export interface Options<C extends ApiConfigBase, R>
   dealError: (
     currentError: RequestFailResult,
     extendConfig: ExtendConfig,
-  ) => Promise<DealErrorResult>;
+  ) => DealErrorResult | Promise<DealErrorResult>;
   /** 展示提示 show: 是否展示 */
   showToast: (message: string, show: boolean) => void;
 }
@@ -141,12 +109,11 @@ export const catchDealError = (
   try {
     return fn();
   } catch (error) {
-    const errorInfo: RequestFailResult = {
+    const errorInfo: RequestFailResult = new RequestFailResultNetwork({
       code: InnerErrorCode.DEAL_ERROR,
       message: "处理RequestFailResult错误时出错",
-      isBusinessError: false,
       cause: error,
-    };
+    });
     return {
       canShowErrorToast: true,
       newError: errorInfo,
@@ -217,7 +184,18 @@ export class Request<C extends ApiConfigBase, R> {
           newError.message,
           canShowErrorToast && (uiConfigFinal.errorToast ?? true),
         );
-        return Promise.reject(newError);
+        let newErrorFinal: RequestFailResult;
+
+        if (newError instanceof RequestFailResultBase) {
+          newErrorFinal = newError;
+        } else {
+          if (newError.isBusinessError) {
+            newErrorFinal = new RequestFailResultBusiness(newError);
+          } else {
+            newErrorFinal = new RequestFailResultNetwork(newError);
+          }
+        }
+        return Promise.reject(newErrorFinal);
       }
     }
   };
@@ -228,58 +206,4 @@ export const createRequest = <C extends ApiConfigBase, R>(
   opt: Options<C, R>,
 ) => {
   return new Request<C, R>(opt);
-};
-
-/** 分发业务结果 */
-export const dispatchBusinessResult = <R, D = any>(
-  res: R,
-  {
-    getBusinessCode,
-    getBusinessMsg,
-    getBusinessData,
-    businessSuccessCodeList,
-  }: BusinessOptions<R>,
-): RequestResult<D> | Promise<RequestResult<D>> => {
-  try {
-    // !!!所有外部传入的function都需要try catch
-    const code = getBusinessCode(res);
-    const message = getBusinessMsg(res);
-    if (businessSuccessCodeList.includes(code)) {
-      const info: RequestResult<D> = {
-        code,
-        data: getBusinessData(res),
-        message,
-      };
-      return info;
-    } else {
-      const errorInfo: RequestFailResult = {
-        code,
-        message,
-        isBusinessError: true,
-      };
-      return Promise.reject(errorInfo);
-    }
-  } catch (error) {
-    const errorInfo: RequestFailResult = {
-      code: InnerErrorCode.DISPATCH_RESPONSE,
-      message: "分发响应结果执行出错",
-      isBusinessError: false,
-      cause: error,
-    };
-    return Promise.reject(errorInfo);
-  }
-};
-
-/** 回调请求转Promise */
-export const callback2Promise = <S, E>(
-  fn: (res: { success: (res: S) => void; fail: (res: E) => void }) => unknown,
-): Promise<S> => {
-  return new Promise((resolve, reject) => {
-    const success = (res: S) => resolve(res);
-    const fail = (res: E) => reject(res);
-    fn({
-      success,
-      fail,
-    });
-  });
 };

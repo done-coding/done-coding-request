@@ -2,13 +2,14 @@ import type { Options, RequestFailResult } from "@done-coding/request-base";
 import {
   dispatchBusinessResult,
   InnerErrorCode,
+  RequestFailResultBase,
+  RequestFailResultNetwork,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import type {
   InternalAxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
   AxiosInterceptorManager,
   AxiosRequestConfig,
   CreateAxiosDefaults,
@@ -17,18 +18,18 @@ import _omit from "lodash/omit";
 
 export * from "@done-coding/request-base";
 
-export const createRequest = ({
+export const createRequest = <S>({
   basePath,
   timeout,
   beforeRequest = (config) => config,
   instanceCreateConfig = {},
   ...otherOpt
-}: Options<InternalAxiosRequestConfig, AxiosResponse> & {
+}: Omit<Options<InternalAxiosRequestConfig, AxiosResponse<S>>, "issue"> & {
   beforeRequest?: Parameters<
     AxiosInterceptorManager<InternalAxiosRequestConfig>["use"]
   >[0];
   /** 示例创建选项 */
-  instanceCreateConfig: Omit<CreateAxiosDefaults, "baseURL" | "timeout">;
+  instanceCreateConfig?: Omit<CreateAxiosDefaults, "baseURL" | "timeout">;
 }) => {
   const instance = axios.create({
     baseURL: basePath,
@@ -37,16 +38,18 @@ export const createRequest = ({
   });
 
   instance.interceptors.request.use(beforeRequest, (error) => {
-    const errorInfo: RequestFailResult = {
+    if (error instanceof RequestFailResultBase) {
+      return Promise.reject(error);
+    }
+    const errorInfo: RequestFailResult = new RequestFailResultNetwork({
       code: InnerErrorCode.REQUEST_ERROR,
       message: "发起请求出错",
-      isBusinessError: false,
       cause: error,
-    };
+    });
     return Promise.reject(errorInfo);
   });
 
-  const { request } = createRequestBase<AxiosRequestConfig, AxiosResponse>({
+  const { request } = createRequestBase<AxiosRequestConfig, AxiosResponse<S>>({
     ...otherOpt,
     basePath,
     timeout,
@@ -68,18 +71,26 @@ export const createRequest = ({
           } else if (request) {
             // 请求已经成功发起，但没有收到响应
             code = InnerErrorCode.NO_RESPONSE;
-            message = "未响应";
+            if (err instanceof AxiosError) {
+              message = err.message;
+            } else {
+              message = "未响应";
+            }
+
+            if (message.includes("timeout of")) {
+              code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+              message = "请求超时";
+            }
           } else {
             // 发送请求时出了点问题
             code = InnerErrorCode.REQUEST_ERROR;
             message = "发起请求出错";
           }
-          const errorInfo: RequestFailResult = {
+          const errorInfo: RequestFailResult = new RequestFailResultNetwork({
             code,
             message,
-            isBusinessError: false,
             cause: err,
-          };
+          });
           return Promise.reject(errorInfo);
         });
     },

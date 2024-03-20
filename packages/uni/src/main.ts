@@ -3,6 +3,8 @@ import {
   dispatchBusinessResult,
   InnerErrorCode,
   callback2Promise,
+  RequestFailResultNetwork,
+  RequestFailResultBase,
 } from "@done-coding/request-base";
 
 import { createRequest as createRequestBase } from "@done-coding/request-base";
@@ -15,7 +17,10 @@ export const createRequest = ({
   timeout,
   beforeRequest = (config) => config,
   ...otherOpt
-}: Options<UniNamespace.RequestOptions, UniApp.RequestSuccessCallbackResult> & {
+}: Omit<
+  Options<UniNamespace.RequestOptions, UniApp.RequestSuccessCallbackResult>,
+  "issue"
+> & {
   beforeRequest?: (
     config: UniNamespace.RequestOptions,
   ) => UniNamespace.RequestOptions | Promise<UniNamespace.RequestOptions>;
@@ -38,12 +43,14 @@ export const createRequest = ({
       try {
         config = await beforeRequest(configInit);
       } catch (error) {
-        const errorInfo: RequestFailResult = {
+        if (error instanceof RequestFailResultBase) {
+          return Promise.reject(error);
+        }
+        const errorInfo: RequestFailResult = new RequestFailResultNetwork({
           code: InnerErrorCode.REQUEST_ERROR,
           message: "发起请求出错",
-          isBusinessError: false,
           cause: error,
-        };
+        });
         return Promise.reject(errorInfo);
       }
 
@@ -104,12 +111,11 @@ export const createRequest = ({
           code = errno || errCode || errNo || error || InnerErrorCode.NO_CODE;
           // #endif
 
-          const errorInfo: RequestFailResult = {
+          const errorInfo: RequestFailResult = new RequestFailResultNetwork({
             code,
             message,
-            isBusinessError: false,
             cause: err,
-          };
+          });
           return Promise.reject(errorInfo);
         });
     },
