@@ -8,6 +8,7 @@ import {
   RequestFailResultBase,
 } from "./error";
 import { DebugLevelEnum, createDebugInfo, DebugStageEnum } from "./debug";
+import { resolveErrorMsg } from "./utils";
 
 /** 请求结果 */
 export interface RequestResult<D> {
@@ -41,6 +42,8 @@ export type ApiConfig<C extends ApiConfigBase> = C & ExtendConfig;
 export type IssueConfig<C extends ApiConfigBase> = C & {
   BASE_PATH: string;
   TIMEOUT: number;
+  /** 开启调试 */
+  DEBUG?: boolean;
 };
 
 /** 业务配置项 */
@@ -100,8 +103,6 @@ export interface Options<C extends ApiConfigBase, R>
   ) => DealErrorResult | Promise<DealErrorResult>;
   /** 展示提示 show: 是否展示 */
   showToast: (message: string, show: boolean) => void;
-  /** 开启调试 */
-  debug?: boolean;
 }
 
 /** dealError错误捕捉 */
@@ -126,7 +127,7 @@ export const catchDealError = (
      */
     const errorInfo: RequestFailResult = new RequestFailResultNetwork({
       code: InnerErrorCode.DEAL_ERROR,
-      message: "处理RequestFailResult错误时出错",
+      message: resolveErrorMsg(error) ?? "处理RequestFailResult错误时出错",
       cause: error,
     });
     return {
@@ -164,23 +165,20 @@ export class Request<C extends ApiConfigBase, R> {
     return this.options.showToast;
   }
 
-  private get debug() {
-    return this.options.debug;
-  }
-
   public constructor(opt: Options<C, R>) {
     this.options = opt;
   }
 
   public request = async <D>(
     apiConfig: ApiConfig<C>,
+    /** 开启调试 */
+    debug = false,
   ): Promise<RequestResult<D>> => {
-    const { dispatchCreateDebugInfo } = this;
-
-    dispatchCreateDebugInfo({
-      stage: DebugStageEnum.BEFORE,
-      data: apiConfig,
-    });
+    debug &&
+      createDebugInfo({
+        stage: DebugStageEnum.BEFORE,
+        data: apiConfig,
+      });
 
     const { uiConfig = {}, ...otherXApiConfig } = apiConfig;
 
@@ -194,6 +192,7 @@ export class Request<C extends ApiConfigBase, R> {
       ...(otherXApiConfig as C),
       BASE_PATH: this.basePath,
       TIMEOUT: this.timeout,
+      debug,
     };
 
     try {
@@ -202,19 +201,20 @@ export class Request<C extends ApiConfigBase, R> {
     } catch (error) {
       const { newError, reload, canShowErrorToast } = await catchDealError(
         () => {
-          this.debug &&
+          debug &&
             createDebugInfo({
               stage: DebugStageEnum.DEAL_ERROR,
               data: error,
             });
           return this.dealError(error as RequestFailResult, extendConfig);
         },
-        this.debug,
+        debug,
       );
       if (reload) {
-        dispatchCreateDebugInfo({
-          stage: DebugStageEnum.DEAL_ERROR_RESULT_RELOAD,
-        });
+        debug &&
+          createDebugInfo({
+            stage: DebugStageEnum.DEAL_ERROR_RESULT_RELOAD,
+          });
         return this.request(apiConfig);
       } else {
         this.showToast(
@@ -233,20 +233,15 @@ export class Request<C extends ApiConfigBase, R> {
           }
         }
 
-        dispatchCreateDebugInfo({
-          stage: DebugStageEnum.DEAL_ERROR_RESULT_CONTINUE,
-          data: newErrorFinal,
-        });
+        debug &&
+          createDebugInfo({
+            stage: DebugStageEnum.DEAL_ERROR_RESULT_CONTINUE,
+            data: newErrorFinal,
+          });
 
         return Promise.reject(newErrorFinal);
       }
     }
-  };
-
-  private dispatchCreateDebugInfo = (
-    ...args: Parameters<typeof createDebugInfo>
-  ) => {
-    this.debug && createDebugInfo(...args);
   };
 }
 

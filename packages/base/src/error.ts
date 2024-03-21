@@ -34,9 +34,12 @@ export class RequestFailResultBase extends Error {
   public code: ErrorOptions["code"];
   /** 是否业务错误 */
   public isBusinessError: boolean;
+  /** 错误信息 */
+  public message: string;
 
   public constructor({ message, code, isBusinessError }: ErrorOptions) {
     super(message);
+    this.message = message;
     this.code = code;
     this.isBusinessError = isBusinessError;
     this.name = "DC Request ERROR";

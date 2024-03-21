@@ -7,6 +7,7 @@ import {
   createDebugInfo,
   DebugLevelEnum,
   DebugStageEnum,
+  resolveErrorMsg,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
 import axios, { AxiosError } from "axios";
@@ -40,42 +41,16 @@ export const createRequest = <S>({
     ...instanceCreateConfig,
   });
 
-  const { debug } = otherOpt;
-
   instance.interceptors.request.use(beforeRequest, (error) => {
-    debug &&
-      createDebugInfo(
-        {
-          stage: DebugStageEnum.BEFORE_ERROR,
-          data: error,
-        },
-        DebugLevelEnum.ERROR,
-      );
     if (error instanceof RequestFailResultBase) {
-      debug &&
-        createDebugInfo(
-          {
-            stage: DebugStageEnum.BEFORE_ERROR_ORIGIN,
-            data: error,
-          },
-          DebugLevelEnum.ERROR,
-        );
       return Promise.reject(error);
     }
     const errorInfo: RequestFailResult = new RequestFailResultNetwork({
       code: InnerErrorCode.REQUEST_ERROR,
-      message: "发起请求出错",
+      message: resolveErrorMsg(error) ?? "发起请求出错",
       cause: error,
     });
 
-    debug &&
-      createDebugInfo(
-        {
-          stage: DebugStageEnum.BEFORE_ERROR_PACK,
-          data: errorInfo,
-        },
-        DebugLevelEnum.ERROR,
-      );
     return Promise.reject(errorInfo);
   });
 
@@ -83,7 +58,7 @@ export const createRequest = <S>({
     ...otherOpt,
     basePath,
     timeout,
-    issue: ({ TIMEOUT, ...otherConfig }) => {
+    issue: ({ TIMEOUT, DEBUG: debug, ...otherConfig }) => {
       return instance({
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
@@ -123,12 +98,12 @@ export const createRequest = <S>({
                 message = err.message;
               }
             } else {
-              message = "未响应";
+              message = resolveErrorMsg(err) ?? "未响应";
             }
           } else {
             // 发送请求时出了点问题
             code = InnerErrorCode.REQUEST_ERROR;
-            message = "发起请求出错";
+            message = resolveErrorMsg(err) ?? "发起请求出错";
           }
           const errorInfo: RequestFailResult = new RequestFailResultNetwork({
             code,

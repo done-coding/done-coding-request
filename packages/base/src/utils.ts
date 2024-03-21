@@ -7,6 +7,13 @@ import {
 import type { BusinessOptions, RequestResult } from "./main";
 import { createDebugInfo, DebugLevelEnum, DebugStageEnum } from "./debug";
 
+/** 获取错误信息 */
+export const resolveErrorMsg = (error: any) => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+};
+
 /** 分发业务结果 */
 export const dispatchBusinessResult = <R, D = any>(
   res: R,
@@ -43,9 +50,13 @@ export const dispatchBusinessResult = <R, D = any>(
         );
       return info;
     } else {
+      if (code === undefined) {
+        throw new Error("业务code未定义");
+      }
+
       const errorInfo: RequestFailResult = new RequestFailResultBusiness({
-        code: code ?? InnerErrorCode.NO_BUSINESS_CODE,
-        message,
+        code,
+        message: message ?? "未知错误",
       });
       debug &&
         createDebugInfo(
@@ -68,7 +79,7 @@ export const dispatchBusinessResult = <R, D = any>(
       );
     const errorInfo: RequestFailResult = new RequestFailResultNetwork({
       code: InnerErrorCode.DISPATCH_RESPONSE,
-      message: "分发响应结果执行出错",
+      message: resolveErrorMsg(error) ?? "分发响应结果执行出错",
       cause: error,
     });
     return Promise.reject(errorInfo);

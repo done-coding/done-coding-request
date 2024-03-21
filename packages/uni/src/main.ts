@@ -8,6 +8,7 @@ import {
   createDebugInfo,
   DebugLevelEnum,
   DebugStageEnum,
+  resolveErrorMsg,
 } from "@done-coding/request-base";
 
 import { createRequest as createRequestBase } from "@done-coding/request-base";
@@ -35,14 +36,13 @@ export const createRequest = ({
     ...otherOpt,
     basePath,
     timeout,
-    issue: async ({ TIMEOUT, url, ...otherConfig }) => {
+    issue: async ({ TIMEOUT, url, DEBUG: debug, ...otherConfig }) => {
       const configInit: UniNamespace.RequestOptions = {
         url: `${basePath}${url}`,
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
       };
 
-      const { debug } = otherOpt;
       let config: typeof configInit;
       try {
         config = await beforeRequest(configInit);
@@ -66,7 +66,7 @@ export const createRequest = ({
         }
         const errorInfo: RequestFailResult = new RequestFailResultNetwork({
           code: InnerErrorCode.REQUEST_ERROR,
-          message: "发起请求出错",
+          message: resolveErrorMsg(error) ?? "发起请求出错",
           cause: error,
         });
         debug &&

@@ -1,4 +1,5 @@
 import { RequestFailResultBase } from "./error";
+import _omit from "lodash/omit";
 /**
  * 调试信息级别
  */
@@ -63,6 +64,6 @@ export const createDebugInfo = <M>(
 ) => {
   console[level](
     stage,
-    data instanceof RequestFailResultBase ? { ...data } : data,
+    data instanceof RequestFailResultBase ? _omit({ ...data }, "cause") : data,
   );
 };
