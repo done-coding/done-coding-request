@@ -8,69 +8,39 @@
 </head>
 
 <body>
-  <button id="btn">触发</button>
   <script type="module">
     import {
-      createRequest
-    } from './src/index.ts';
-
-    const request = createRequest({
-      basePath: '',
-      timeout: 1000,
-      businessSuccessCodeList: [200],
-      getBusinessCode: (res) => {
-        const {
-          data: {
-            code
-          }
-        } = res;
-        return code;
-      },
-      getBusinessData: ({
-        data: {
-          data
-        }
-      }) => {
-        return data;
-      },
-      getBusinessMsg: ({
-        data: {
-          message
-        }
-      }) => {
-        return message;
-      },
-      beforeRequest: (config) => {
-        return config;
-      },
-      dealError: (error) => {
-        if (error.isBusinessError) {
-          return {
-            canShowErrorToast: true,
-            newError: error,
-          };
-        } else {
-          return {
-            canShowErrorToast: true,
-            newError: error,
-          };
-        }
-      },
-      showToast: (message, show) => {
-        console.log(message, show);
-      },
-      debug: true
-    });
+      getRequest,
+      SceneUrlEnum
+    } from './src/__tests__/request.ts';
 
 
-    document.getElementById('btn').addEventListener('click', () => {
+    const request = getRequest()
+
+    const sendRequest = (method, url) => {
       request({
-        url: '/test',
-        method: 'get',
-      }).then(res => {
-        console.log('业务成功', res)
-      }).catch(err => {
-        console.log('请求失败', err)
+        url,
+        method,
+        data: {
+          name: 'test'
+        },
+        params: {
+          id: 1
+        }
+      })
+    }
+
+    Object.keys(SceneUrlEnum).filter(item => !item.startsWith('/')).forEach((key) => {
+      ['post', 'get'].forEach((method) => {
+
+        const url = SceneUrlEnum[key]
+        const btn = document.createElement('button')
+        btn.setAttribute('type', 'button')
+        btn.style.display = 'block'
+        btn.innerText = `${method} ${key}`
+        btn.onclick = () => sendRequest(method, url)
+        document.body.appendChild(btn)
+
       })
     })
   </script>

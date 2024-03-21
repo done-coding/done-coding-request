@@ -13,11 +13,23 @@ export enum SceneUrlEnum {
   SUCCESS_MODEL_ERROR = "/get/success/modelError",
   /** 请求成功但业务失败 */
   SUCCESS_BUSINESS_FAIL = "/get/success/businessFail",
+  /** 请求成功但业务失败且显示错误提示 */
+  SUCCESS_BUSINESS_FAIL_SHOW_TOAST = "/get/success/businessFailShowToast",
   /** 请求成功且业务成功 */
   SUCCESS_BUSINESS_SUCCESS = "/get/success/businessSuccess",
 }
 
-export const getRequest = (basePath: string, timeout = 1000) => {
+export const getRequest = ({
+  basePath = "",
+  timeout = 1000,
+  showToast,
+  beforeError,
+}: {
+  basePath?: string;
+  timeout?: number;
+  showToast?: (message: string) => void;
+  beforeError?: Parameters<typeof createRequest>[0]["beforeError"];
+} = {}) => {
   return createRequest<{
     code: number;
     data: any;
@@ -26,14 +38,14 @@ export const getRequest = (basePath: string, timeout = 1000) => {
     basePath,
     timeout,
     businessSuccessCodeList: [200],
-    getBusinessCode: ({ data: { code } }) => {
-      return code;
+    getBusinessCode: ({ data }) => {
+      return data.code;
     },
-    getBusinessData: ({ data: { data } }) => {
-      return data;
+    getBusinessData: ({ data }) => {
+      return data.data;
     },
-    getBusinessMsg: ({ data: { message } }) => {
-      return message;
+    getBusinessMsg: ({ data }) => {
+      return data.message;
     },
     beforeRequest: (config) => {
       if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST) {
@@ -41,21 +53,10 @@ export const getRequest = (basePath: string, timeout = 1000) => {
       }
       return config;
     },
-    dealError: (error) => {
-      if (error.isBusinessError) {
-        return {
-          canShowErrorToast: true,
-          newError: error,
-        };
-      } else {
-        return {
-          canShowErrorToast: true,
-          newError: error,
-        };
-      }
-    },
-    showToast: (message, show) => {
-      console.log(message, show);
+    beforeError,
+    showToast,
+    uiConfig: {
+      errorToast: true,
     },
   });
 };

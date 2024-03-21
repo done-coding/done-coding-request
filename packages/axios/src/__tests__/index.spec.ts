@@ -1,88 +1,72 @@
-import { describe, test, expect, beforeAll } from "vitest";
+import { describe, test, expect, beforeAll, vi } from "vitest";
 import { setupServer } from "msw/node";
-import { HttpResponse, http } from "msw";
+import { HttpResponse, http, delay } from "msw";
+import { getRequest, SceneUrlEnum } from "./request";
 
-import { InnerErrorCode, createRequest } from "@/index";
+import type { createRequest } from "@/index";
+import { InnerErrorCode } from "@/index";
 
 let server: ReturnType<typeof setupServer>;
 
 let request: ReturnType<typeof createRequest>;
 
-const basePath = "https://test.com";
+const basePath = `https://${Date.now().toString(36)}.com`;
+
+const timeout = 1000;
 
 const getUrl = (path: string) => {
   return `${basePath}${path}`;
 };
 
-enum SceneUrlEnum {
-  /** 请求前出错 */
-  FAIL_BEFORE_REQUEST = "/get/fail/beforeRequest",
-  /** 请求前未响应 */
-  FAIL_NO_RESPONSE = "/get/fail/noResponse",
-  /** 请求成功但业务结构错误 */
-  SUCCESS_MODEL_ERROR = "/get/success/modelError",
-  /** 请求成功且业务成功 */
-  SUCCESS_BUSINESS_SUCCESS = "/get/success/businessSuccess",
-  /** 请求成功但业务失败 */
-  SUCCESS_BUSINESS_FAIL = "/get/success/businessFail",
-}
+const showToast = vi.fn();
 
 beforeAll(() => {
-  request = createRequest<{
-    code: number;
-    data: any;
-    message: string;
-  }>({
+  request = getRequest({
     basePath,
-    timeout: 1000,
-    businessSuccessCodeList: [200],
-    getBusinessCode: ({ data: { code } }) => {
-      return code;
-    },
-    getBusinessData: ({ data: { data } }) => {
-      return data;
-    },
-    getBusinessMsg: ({ data: { message } }) => {
-      return message;
-    },
-    beforeRequest: (config) => {
-      return config;
-    },
-    dealError: (error) => {
+    timeout,
+    showToast,
+    beforeError: (error, { apiConfig: { url } }) => {
       if (error.isBusinessError) {
         return {
-          canShowErrorToast: true,
           newError: error,
+          canShowErrorToast:
+            url === SceneUrlEnum.SUCCESS_BUSINESS_FAIL_SHOW_TOAST,
         };
       } else {
         return {
-          canShowErrorToast: true,
           newError: error,
+          canShowErrorToast: true,
         };
       }
     },
-    showToast: (message, show) => {
-      console.log(message, show);
-    },
-    debug: true,
   });
 
   server = setupServer(
     ...[
+      http.get(getUrl(SceneUrlEnum.FAIL_TIMEOUT), async () => {
+        await delay(timeout * 2);
+        return HttpResponse.json();
+      }),
       http.get(getUrl(SceneUrlEnum.SUCCESS_MODEL_ERROR), () => {
-        return HttpResponse.json(1);
+        return HttpResponse.json();
       }),
       http.get(getUrl(SceneUrlEnum.SUCCESS_BUSINESS_FAIL), () => {
         return HttpResponse.json({
           code: 403,
-          data: [1],
-          message: "success",
+          data: 1,
+        });
+      }),
+      http.get(getUrl(SceneUrlEnum.SUCCESS_BUSINESS_FAIL_SHOW_TOAST), () => {
+        return HttpResponse.json({
+          code: 9527,
+          data: 1,
+          message: SceneUrlEnum.SUCCESS_BUSINESS_FAIL_SHOW_TOAST,
         });
       }),
       http.get(getUrl(SceneUrlEnum.SUCCESS_BUSINESS_SUCCESS), () => {
         return HttpResponse.json({
           code: 200,
-          data: [1],
+          data: 1,
           message: "success",
         });
       }),
@@ -103,27 +87,39 @@ describe("axios正常配置", () => {
       )
       .rejects.toMatchObject({
         code: InnerErrorCode.REQUEST_ERROR,
-        message: "发起请求出错",
         isBusinessError: false,
       });
   });
 
-  test.skip("get请求失败-未响应", async () => {
+  test("get请求失败-超时", async () => {
     await expect
       .soft(
         request({
-          url: SceneUrlEnum.FAIL_NO_RESPONSE,
+          url: SceneUrlEnum.FAIL_TIMEOUT,
+          method: "get",
+        }),
+      )
+      .rejects.toMatchObject({
+        code: InnerErrorCode.NO_RESPONSE_TIMEOUT,
+        isBusinessError: false,
+      });
+  });
+
+  test("get请求失败-未响应", async () => {
+    await expect
+      .soft(
+        request({
+          url: SceneUrlEnum.FAIL_OFFLINE,
           method: "get",
         }),
       )
       .rejects.toMatchObject({
         code: InnerErrorCode.NO_RESPONSE,
-        message: "未响应",
         isBusinessError: false,
       });
   });
 
-  test.skip("get请求成功但业务结构错误", async () => {
+  test("get请求成功但业务结构错误", async () => {
     await expect
       .soft(
         request({
@@ -137,20 +133,58 @@ describe("axios正常配置", () => {
       });
   });
 
-  test.skip("get请求成功但业务失败", async () => {
-    await expect
-      .soft(
-        request({
-          url: SceneUrlEnum.SUCCESS_BUSINESS_FAIL,
-          method: "get",
-        }),
-      )
-      .rejects.toMatchObject({
-        isBusinessError: true,
-      });
+  describe("get请求成功但业务失败", () => {
+    test("get请求成功但业务失败-失败结果", async () => {
+      await expect
+        .soft(
+          request({
+            url: SceneUrlEnum.SUCCESS_BUSINESS_FAIL,
+            method: "get",
+          }),
+        )
+        .rejects.toMatchObject({
+          isBusinessError: true,
+        });
+    });
+
+    test("显示错误提示", async () => {
+      showToast.mockClear();
+      await expect
+        .soft(
+          request({
+            url: SceneUrlEnum.SUCCESS_BUSINESS_FAIL_SHOW_TOAST,
+            method: "get",
+          }),
+        )
+        .rejects.toMatchObject({
+          isBusinessError: true,
+        });
+      expect(showToast).toBeCalledTimes(1);
+      expect(showToast).toHaveBeenCalledWith(
+        SceneUrlEnum.SUCCESS_BUSINESS_FAIL_SHOW_TOAST,
+      );
+    });
+
+    test("不显示错误提示", async () => {
+      showToast.mockClear();
+      await expect
+        .soft(
+          request({
+            url: SceneUrlEnum.SUCCESS_BUSINESS_FAIL,
+            method: "get",
+            uiConfig: {
+              errorToast: false,
+            },
+          }),
+        )
+        .rejects.toMatchObject({
+          isBusinessError: true,
+        });
+      expect(showToast).toBeCalledTimes(0);
+    });
   });
 
-  test.skip("get请求成功且业务成功", async () => {
+  test("get请求成功且业务成功", async () => {
     await expect
       .soft(
         request({
@@ -160,7 +194,7 @@ describe("axios正常配置", () => {
       )
       .resolves.toMatchObject({
         code: 200,
-        data: [1],
+        data: 1,
         message: "success",
       });
   });
