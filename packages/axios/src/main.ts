@@ -16,6 +16,7 @@ import type {
   AxiosResponse,
   AxiosInterceptorManager,
   CreateAxiosDefaults,
+  AxiosRequestConfig,
 } from "axios";
 import _omit from "lodash/omit";
 import _get from "lodash/get";
@@ -27,7 +28,7 @@ export const createRequest = <S>({
   beforeRequest = (config) => config,
   instanceCreateConfig = {},
   ...otherOpt
-}: Omit<Options<InternalAxiosRequestConfig, AxiosResponse<S>>, "issue"> & {
+}: Omit<Options<AxiosRequestConfig, AxiosResponse<S>>, "issue"> & {
   beforeRequest?: Parameters<
     AxiosInterceptorManager<InternalAxiosRequestConfig>["use"]
   >[0];
@@ -53,10 +54,7 @@ export const createRequest = <S>({
     return Promise.reject(errorInfo);
   });
 
-  const { request } = createRequestBase<
-    InternalAxiosRequestConfig,
-    AxiosResponse<S>
-  >({
+  const { request } = createRequestBase<AxiosRequestConfig, AxiosResponse<S>>({
     ...otherOpt,
     basePath,
     timeout,
