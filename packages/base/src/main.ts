@@ -58,15 +58,26 @@ export interface BusinessOptions<R> {
   businessSuccessCodeList: number[];
 }
 
-/** 处理错误结果 */
-export interface BeforeErrorResult {
+/**
+ * 处理错误结果重新请求
+ */
+export interface BeforeErrorResultReload {
+  reload: true;
+}
+
+/** 处理错误结果不重新请求 */
+export interface BeforeErrorResultNotReload {
   /** 可以展示错误提示 */
   canShowErrorToast?: boolean;
-  /** 重新请求 */
-  reload?: boolean;
+  reload?: false;
   /** 新的错误 */
   newError: RequestFailResult;
 }
+
+/** 处理错误结果 */
+export type BeforeErrorResult =
+  | BeforeErrorResultReload
+  | BeforeErrorResultNotReload;
 
 /** request 选项 */
 export interface Options<C extends ApiConfigBase, R>
@@ -95,7 +106,7 @@ export interface Options<C extends ApiConfigBase, R>
 
 /** dealError错误捕捉 */
 // !!!所有外部传入的function都需要try catch
-export const catchDealError = (
+export const catchBeforeError = (
   fn: () => BeforeErrorResult | Promise<BeforeErrorResult>,
   debug?: boolean,
 ): BeforeErrorResult | Promise<BeforeErrorResult> => {
@@ -187,11 +198,7 @@ export class Request<C extends ApiConfigBase, R> {
       const res = await this.issue<D>(config, extendConfig);
       return res;
     } catch (error) {
-      const {
-        newError,
-        reload,
-        canShowErrorToast = true,
-      } = await catchDealError(() => {
+      const beforeErrorRes = await catchBeforeError(() => {
         debug &&
           createDebugInfo({
             stage: DebugStageEnum.DEAL_ERROR,
@@ -207,13 +214,14 @@ export class Request<C extends ApiConfigBase, R> {
           }
         );
       }, debug);
-      if (reload) {
+      if (beforeErrorRes.reload) {
         debug &&
           createDebugInfo({
             stage: DebugStageEnum.DEAL_ERROR_RESULT_RELOAD,
           });
         return this.request(apiConfig);
       } else {
+        const { newError, canShowErrorToast = true } = beforeErrorRes;
         if (canShowErrorToast && (uiConfigFinal.errorToast ?? true)) {
           this.showToast?.(newError.message);
         }
