@@ -3,6 +3,8 @@ import { createRequest } from "..";
 export enum SceneUrlEnum {
   /** 请求前出错 */
   FAIL_BEFORE_REQUEST = "/get/fail/beforeRequest",
+  /** 请求前出错2 */
+  FAIL_BEFORE_REQUEST_2 = "/get/fail/beforeRequest2",
   /** 请求前超时 */
   FAIL_TIMEOUT = "/get/fail/beforeTimeout",
   /** 请求断网 */
@@ -17,6 +19,8 @@ export enum SceneUrlEnum {
   SUCCESS_BUSINESS_FAIL_SHOW_TOAST = "/get/success/businessFailShowToast",
   /** 请求成功且业务成功 */
   SUCCESS_BUSINESS_SUCCESS = "/get/success/businessSuccess",
+  /** 失败静默重新请求 */
+  FAIL_RELOAD = "/get/fail/reload",
 }
 
 export const getRequest = ({
@@ -24,11 +28,13 @@ export const getRequest = ({
   timeout = 1000,
   showToast,
   beforeError,
+  beforeRequest,
 }: {
   basePath?: string;
   timeout?: number;
   showToast?: (message: string) => void;
   beforeError?: Parameters<typeof createRequest>[0]["beforeError"];
+  beforeRequest?: Parameters<typeof createRequest>[0]["beforeRequest"];
 } = {}) => {
   return createRequest<{
     code: number;
@@ -47,12 +53,7 @@ export const getRequest = ({
     getBusinessMsg: ({ data }) => {
       return data.message;
     },
-    beforeRequest: (config) => {
-      if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST) {
-        throw new Error("请求前出错测试");
-      }
-      return config;
-    },
+    beforeRequest,
     beforeError,
     showToast,
     uiConfig: {

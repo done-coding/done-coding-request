@@ -15,7 +15,14 @@
     } from './src/__tests__/request.ts';
 
 
-    const request = getRequest()
+    const request = getRequest({
+      beforeRequest: (config) => {
+        if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST) {
+          throw new Error("请求前出错测试");
+        }
+        return config;
+      }
+    })
 
     const sendRequest = (method, url) => {
       request({
