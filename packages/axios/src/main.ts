@@ -15,7 +15,6 @@ import type {
   InternalAxiosRequestConfig,
   AxiosResponse,
   AxiosInterceptorManager,
-  AxiosRequestConfig,
   CreateAxiosDefaults,
 } from "axios";
 import _omit from "lodash/omit";
@@ -54,7 +53,10 @@ export const createRequest = <S>({
     return Promise.reject(errorInfo);
   });
 
-  const { request } = createRequestBase<AxiosRequestConfig, AxiosResponse<S>>({
+  const { request } = createRequestBase<
+    InternalAxiosRequestConfig,
+    AxiosResponse<S>
+  >({
     ...otherOpt,
     basePath,
     timeout,

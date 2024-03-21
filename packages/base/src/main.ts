@@ -58,29 +58,14 @@ export interface BusinessOptions<R> {
   businessSuccessCodeList: number[];
 }
 
-/** 网络配置项 */
-export interface NetworkOptions {
-  /** 获取网络状态码 */
-  getNetworkCode: (res: unknown) => number;
-  /** 获取网络信息 */
-  getNetworkMsg: (res: unknown) => string;
-}
-
 /** 处理错误结果 */
-export interface DealErrorResult {
+export interface BeforeErrorResult {
   /** 可以展示错误提示 */
-  canShowErrorToast: boolean;
+  canShowErrorToast?: boolean;
   /** 重新请求 */
   reload?: boolean;
   /** 新的错误 */
   newError: RequestFailResult;
-}
-
-/** 请求相关hook */
-export interface RequestHook<C extends ApiConfigBase> {
-  beforeRequest?: (
-    config: IssueConfig<C>,
-  ) => IssueConfig<C> | Promise<IssueConfig<C>>;
 }
 
 /** request 选项 */
@@ -97,20 +82,23 @@ export interface Options<C extends ApiConfigBase, R>
     extendConfig: ExtendConfig,
   ) => Promise<RequestResult<D>>;
   /** 处理错误 */
-  dealError: (
+  beforeError?: (
     currentError: RequestFailResult,
-    extendConfig: ExtendConfig,
-  ) => DealErrorResult | Promise<DealErrorResult>;
-  /** 展示提示 show: 是否展示 */
-  showToast: (message: string, show: boolean) => void;
+    options: {
+      extendConfig: ExtendConfig;
+      apiConfig: ApiConfig<C>;
+    },
+  ) => BeforeErrorResult | Promise<BeforeErrorResult>;
+  /** 展示提示 */
+  showToast?: (message: string) => void;
 }
 
 /** dealError错误捕捉 */
 // !!!所有外部传入的function都需要try catch
 export const catchDealError = (
-  fn: () => DealErrorResult | Promise<DealErrorResult>,
+  fn: () => BeforeErrorResult | Promise<BeforeErrorResult>,
   debug?: boolean,
-): DealErrorResult | Promise<DealErrorResult> => {
+): BeforeErrorResult | Promise<BeforeErrorResult> => {
   try {
     return fn();
   } catch (error) {
@@ -157,8 +145,8 @@ export class Request<C extends ApiConfigBase, R> {
     return this.options.issue;
   }
 
-  private get dealError() {
-    return this.options.dealError;
+  private get beforeError() {
+    return this.options.beforeError;
   }
 
   private get showToast() {
@@ -199,17 +187,26 @@ export class Request<C extends ApiConfigBase, R> {
       const res = await this.issue<D>(config, extendConfig);
       return res;
     } catch (error) {
-      const { newError, reload, canShowErrorToast } = await catchDealError(
-        () => {
-          debug &&
-            createDebugInfo({
-              stage: DebugStageEnum.DEAL_ERROR,
-              data: error,
-            });
-          return this.dealError(error as RequestFailResult, extendConfig);
-        },
-        debug,
-      );
+      const {
+        newError,
+        reload,
+        canShowErrorToast = true,
+      } = await catchDealError(() => {
+        debug &&
+          createDebugInfo({
+            stage: DebugStageEnum.DEAL_ERROR,
+            data: error,
+          });
+        return (
+          this.beforeError?.(error as RequestFailResult, {
+            apiConfig,
+            extendConfig,
+          }) || {
+            canShowErrorToast: true,
+            newError: error as RequestFailResult,
+          }
+        );
+      }, debug);
       if (reload) {
         debug &&
           createDebugInfo({
@@ -217,10 +214,9 @@ export class Request<C extends ApiConfigBase, R> {
           });
         return this.request(apiConfig);
       } else {
-        this.showToast(
-          newError.message,
-          canShowErrorToast && (uiConfigFinal.errorToast ?? true),
-        );
+        if (canShowErrorToast && (uiConfigFinal.errorToast ?? true)) {
+          this.showToast?.(newError.message);
+        }
         let newErrorFinal: RequestFailResult;
 
         if (newError instanceof RequestFailResultBase) {
