@@ -8,11 +8,71 @@
 </head>
 
 <body>
-  <div id="app">app</div>
+  <button id="btn">触发</button>
   <script type="module">
-    import * as mod from './src/index.ts';
+    import {
+      createRequest
+    } from './src/index.ts';
 
-    console.log(mod);
+    const request = createRequest({
+      basePath: '',
+      timeout: 1000,
+      businessSuccessCodeList: [200],
+      getBusinessCode: (res) => {
+        const {
+          data: {
+            code
+          }
+        } = res;
+        return code;
+      },
+      getBusinessData: ({
+        data: {
+          data
+        }
+      }) => {
+        return data;
+      },
+      getBusinessMsg: ({
+        data: {
+          message
+        }
+      }) => {
+        return message;
+      },
+      beforeRequest: (config) => {
+        return config;
+      },
+      dealError: (error) => {
+        if (error.isBusinessError) {
+          return {
+            canShowErrorToast: true,
+            newError: error,
+          };
+        } else {
+          return {
+            canShowErrorToast: true,
+            newError: error,
+          };
+        }
+      },
+      showToast: (message, show) => {
+        console.log(message, show);
+      },
+      debug: true
+    });
+
+
+    document.getElementById('btn').addEventListener('click', () => {
+      request({
+        url: '/test',
+        method: 'get',
+      }).then(res => {
+        console.log('业务成功', res)
+      }).catch(err => {
+        console.log('请求失败', err)
+      })
+    })
   </script>
 </body>
 
