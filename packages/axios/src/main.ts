@@ -4,6 +4,9 @@ import {
   InnerErrorCode,
   RequestFailResultBase,
   RequestFailResultNetwork,
+  createDebugInfo,
+  DebugLevelEnum,
+  DebugStageEnum,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
 import axios, { AxiosError } from "axios";
@@ -15,7 +18,7 @@ import type {
   CreateAxiosDefaults,
 } from "axios";
 import _omit from "lodash/omit";
-
+import _get from "lodash/get";
 export * from "@done-coding/request-base";
 
 export const createRequest = <S>({
@@ -37,8 +40,26 @@ export const createRequest = <S>({
     ...instanceCreateConfig,
   });
 
+  const { debug } = otherOpt;
+
   instance.interceptors.request.use(beforeRequest, (error) => {
+    debug &&
+      createDebugInfo(
+        {
+          stage: DebugStageEnum.BEFORE_ERROR,
+          data: error,
+        },
+        DebugLevelEnum.ERROR,
+      );
     if (error instanceof RequestFailResultBase) {
+      debug &&
+        createDebugInfo(
+          {
+            stage: DebugStageEnum.BEFORE_ERROR_ORIGIN,
+            data: error,
+          },
+          DebugLevelEnum.ERROR,
+        );
       return Promise.reject(error);
     }
     const errorInfo: RequestFailResult = new RequestFailResultNetwork({
@@ -46,6 +67,15 @@ export const createRequest = <S>({
       message: "发起请求出错",
       cause: error,
     });
+
+    debug &&
+      createDebugInfo(
+        {
+          stage: DebugStageEnum.BEFORE_ERROR_PACK,
+          data: errorInfo,
+        },
+        DebugLevelEnum.ERROR,
+      );
     return Promise.reject(errorInfo);
   });
 
@@ -58,8 +88,19 @@ export const createRequest = <S>({
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
       })
-        .then((res) => dispatchBusinessResult(res, otherOpt))
+        .then((res) => dispatchBusinessResult(res, otherOpt, debug))
         .catch((err) => {
+          if (err instanceof RequestFailResultBase) {
+            debug &&
+              createDebugInfo(
+                {
+                  stage: DebugStageEnum.NETWORK_ERROR_ORIGIN,
+                  data: err,
+                },
+                DebugLevelEnum.ERROR,
+              );
+            return Promise.reject(err);
+          }
           // https://www.axios-http.cn/docs/handling_errors
           const { response, request } = err as AxiosError;
           let code: RequestFailResult["code"];
@@ -72,14 +113,17 @@ export const createRequest = <S>({
             // 请求已经成功发起，但没有收到响应
             code = InnerErrorCode.NO_RESPONSE;
             if (err instanceof AxiosError) {
-              message = err.message;
+              if (err.message.includes("timeout of")) {
+                code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+                message = "请求超时";
+              } else if (_get(globalThis, "navigator.onLine") === false) {
+                code = InnerErrorCode.NO_RESPONSE_OFFLINE;
+                message = "网络未连接";
+              } else {
+                message = err.message;
+              }
             } else {
               message = "未响应";
-            }
-
-            if (message.includes("timeout of")) {
-              code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
-              message = "请求超时";
             }
           } else {
             // 发送请求时出了点问题
@@ -91,6 +135,14 @@ export const createRequest = <S>({
             message,
             cause: err,
           });
+          debug &&
+            createDebugInfo(
+              {
+                stage: DebugStageEnum.NETWORK_ERROR_PACK,
+                data: errorInfo,
+              },
+              DebugLevelEnum.ERROR,
+            );
           return Promise.reject(errorInfo);
         });
     },

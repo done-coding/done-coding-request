@@ -8,12 +8,16 @@ export enum InnerErrorCode {
   NO_RESPONSE = "NO_RESPONSE",
   /** 超时未响应 */
   NO_RESPONSE_TIMEOUT = "NO_RESPONSE_TIMEOUT",
+  /** 离线未响应 */
+  NO_RESPONSE_OFFLINE = "NO_RESPONSE_OFFLINE",
   /** 分发响应结果执行出错 */
   DISPATCH_RESPONSE = "DISPATCH_RESPONSE",
   /** 处理RequestFailResult错误时出错 */
   DEAL_ERROR = "DEAL_ERROR",
-  /** 无错误码 */
-  NO_CODE = "NO_CODE",
+  /** 无业务码 */
+  NO_BUSINESS_CODE = "NO_BUSINESS_CODE",
+  /** 无网络错误码 */
+  NO_NETWORK_CODE = "NO_NETWORK_CODE",
 }
 
 interface ErrorOptions {

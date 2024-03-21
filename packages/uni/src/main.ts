@@ -5,6 +5,9 @@ import {
   callback2Promise,
   RequestFailResultNetwork,
   RequestFailResultBase,
+  createDebugInfo,
+  DebugLevelEnum,
+  DebugStageEnum,
 } from "@done-coding/request-base";
 
 import { createRequest as createRequestBase } from "@done-coding/request-base";
@@ -39,11 +42,26 @@ export const createRequest = ({
         ..._omit(otherConfig, ["BASE_PATH"]),
       };
 
+      const { debug } = otherOpt;
       let config: typeof configInit;
       try {
         config = await beforeRequest(configInit);
       } catch (error) {
+        debug &&
+          createDebugInfo(
+            { stage: DebugStageEnum.BEFORE_ERROR, data: error },
+            DebugLevelEnum.ERROR,
+          );
+
         if (error instanceof RequestFailResultBase) {
+          debug &&
+            createDebugInfo(
+              {
+                stage: DebugStageEnum.BEFORE_ERROR_ORIGIN,
+                data: error,
+              },
+              DebugLevelEnum.ERROR,
+            );
           return Promise.reject(error);
         }
         const errorInfo: RequestFailResult = new RequestFailResultNetwork({
@@ -51,6 +69,14 @@ export const createRequest = ({
           message: "发起请求出错",
           cause: error,
         });
+        debug &&
+          createDebugInfo(
+            {
+              stage: DebugStageEnum.BEFORE_ERROR_PACK,
+              data: errorInfo,
+            },
+            DebugLevelEnum.ERROR,
+          );
         return Promise.reject(errorInfo);
       }
 
@@ -66,6 +92,15 @@ export const createRequest = ({
       })
         .then((res) => dispatchBusinessResult(res, otherOpt))
         .catch((err) => {
+          debug &&
+            createDebugInfo(
+              {
+                stage: DebugStageEnum.NETWORK_ERROR,
+                data: err,
+              },
+              DebugLevelEnum.ERROR,
+            );
+
           const {
             errMsg: message,
             errno,
@@ -95,20 +130,25 @@ export const createRequest = ({
           let code: RequestFailResult["code"];
           // https://developers.weixin.qq.com/miniprogram/dev/framework/usability/PublicErrno.html
           // #ifdef MP-WEIXIN
-          code = errno ?? errCode ?? InnerErrorCode.NO_CODE;
+          code = errno ?? errCode ?? InnerErrorCode.NO_NETWORK_CODE;
 
           // #endif
 
           // #ifdef MP-TOUTIAO
-          code = errNo ?? InnerErrorCode.NO_CODE;
+          code = errNo ?? InnerErrorCode.NO_NETWORK_CODE;
           // #endif
 
           // #ifdef MP-ALIPAY
-          code = error ?? InnerErrorCode.NO_CODE;
+          code = error ?? InnerErrorCode.NO_NETWORK_CODE;
           // #endif
 
           // #ifndef MP-WEIXIN || MP-TOUTIAO || MP-ALIPAY
-          code = errno || errCode || errNo || error || InnerErrorCode.NO_CODE;
+          code =
+            errno ||
+            errCode ||
+            errNo ||
+            error ||
+            InnerErrorCode.NO_NETWORK_CODE;
           // #endif
 
           const errorInfo: RequestFailResult = new RequestFailResultNetwork({
@@ -116,6 +156,14 @@ export const createRequest = ({
             message,
             cause: err,
           });
+          debug &&
+            createDebugInfo(
+              {
+                stage: DebugStageEnum.NETWORK_ERROR_PACK,
+                data: errorInfo,
+              },
+              DebugLevelEnum.ERROR,
+            );
           return Promise.reject(errorInfo);
         });
     },
