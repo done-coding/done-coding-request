@@ -15,6 +15,7 @@ const build = {
     external: [
       ...Object.keys(lodash).map((key) => `lodash/${key}`),
       ...Object.keys(pkg.dependencies),
+      ...Object.keys(pkg.peerDependencies),
     ],
     input: ["src/index.ts"],
     output: [
@@ -60,6 +61,7 @@ export default defineConfig({
         "./src/**/*.d.ts",
         "./src/**/*.json",
       ],
+      exclude: ["**/__tests__/**"],
       outDir: "./types",
     }),
   ],
