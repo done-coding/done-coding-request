@@ -30,6 +30,17 @@ export const createServer = () => {
         },
       ),
       http[method as keyof typeof http](
+        getUrl(SceneUrlEnum.FAIL_NETWORK_CODE_404),
+        () => {
+          return new HttpResponse(
+            {},
+            {
+              status: 404,
+            },
+          );
+        },
+      ),
+      http[method as keyof typeof http](
         getUrl(SceneUrlEnum.SUCCESS_MODEL_ERROR),
         () => {
           return HttpResponse.json();

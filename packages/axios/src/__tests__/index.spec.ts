@@ -170,6 +170,21 @@ beforeAll(() => {
           code: InnerErrorCode.NO_RESPONSE_OFFLINE,
           isBusinessError: false,
         });
+      vi.unstubAllGlobals();
+    });
+
+    test("响应404", async () => {
+      await expect
+        .soft(
+          request({
+            url: SceneUrlEnum.FAIL_NETWORK_CODE_404,
+            method: "get",
+          }),
+        )
+        .rejects.toMatchObject({
+          code: 404,
+          isBusinessError: false,
+        });
     });
 
     test("请求成功但业务结构错误", async () => {

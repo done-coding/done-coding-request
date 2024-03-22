@@ -11,6 +11,8 @@ export enum SceneUrlEnum {
   FAIL_OFFLINE = "/get/fail/beforeOffline",
   /** 请求前未响应 */
   FAIL_NO_RESPONSE = "/get/fail/noResponse",
+  /** 网络状态码 */
+  FAIL_NETWORK_CODE_404 = "/get/fail/networkError/404",
   /** 请求成功但业务结构错误 */
   SUCCESS_MODEL_ERROR = "/get/success/modelError",
   /** 请求成功但业务失败 */
