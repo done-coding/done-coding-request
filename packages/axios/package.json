@@ -28,6 +28,7 @@
   "author": "JustSoSu",
   "license": "ISC",
   "devDependencies": {
+    "@types/jsdom": "^21.1.6",
     "@types/lodash": "^4.14.198",
     "@types/qs": "^6.9.9",
     "@vitest/coverage-istanbul": "^1.1.1",

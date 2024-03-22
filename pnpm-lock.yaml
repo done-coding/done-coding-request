@@ -60,6 +60,9 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
     devDependencies:
+      '@types/jsdom':
+        specifier: ^21.1.6
+        version: 21.1.6
       '@types/lodash':
         specifier: ^4.14.198
         version: 4.14.202
@@ -103,6 +106,9 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
     devDependencies:
+      '@types/jsdom':
+        specifier: ^21.1.6
+        version: 21.1.6
       '@types/lodash':
         specifier: ^4.14.198
         version: 4.14.202
@@ -149,6 +155,9 @@ importers:
       '@dcloudio/uni-app':
         specifier: 2.0.2-3090920231225001
         version: 2.0.2-3090920231225001(@dcloudio/types@3.4.8)(@vue/composition-api@1.7.2)
+      '@types/jsdom':
+        specifier: ^21.1.6
+        version: 21.1.6
       '@types/lodash':
         specifier: ^4.14.198
         version: 4.14.202
@@ -1747,6 +1756,14 @@ packages:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
 
+  /@types/jsdom@21.1.6:
+    resolution: {integrity: sha512-/7kkMsC+/kMs7gAYmmBR9P0vGTnOoLhQhyhQJSlXGI5bzTHp6xdo0TtKWQAsz6pmSAeVqKSbqeyP6hytqr9FDw==}
+    dependencies:
+      '@types/node': 18.19.4
+      '@types/tough-cookie': 4.0.5
+      parse5: 7.1.2
+    dev: true
+
   /@types/json-schema@7.0.13:
     resolution: {integrity: sha512-RbSSoHliUbnXj3ny0CNFOoxrIDV6SUGyStHsvDqosw6CkdPV8TtWGlfecuK4ToyMEAql6pzNxgCFKanovUzlgQ==}
     dev: true
@@ -1803,6 +1820,10 @@ packages:
 
   /@types/statuses@2.0.5:
     resolution: {integrity: sha512-jmIUGWrAiwu3dZpxntxieC+1n/5c3mjrImkmOSQ2NC5uP6cYO4aAZDdSmRcI5C1oiTmqlZGHC+/NmJrKogbP5A==}
+    dev: true
+
+  /@types/tough-cookie@4.0.5:
+    resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
     dev: true
 
   /@types/wrap-ansi@3.0.0:

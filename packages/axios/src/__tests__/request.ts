@@ -6,7 +6,7 @@ export enum SceneUrlEnum {
   /** 请求前出错2 */
   FAIL_BEFORE_REQUEST_2 = "/get/fail/beforeRequest2",
   /** 请求前超时 */
-  FAIL_TIMEOUT = "/get/fail/beforeTimeout",
+  FAIL_TIMEOUT = "/get/fail/timeout",
   /** 请求断网 */
   FAIL_OFFLINE = "/get/fail/beforeOffline",
   /** 请求前未响应 */
