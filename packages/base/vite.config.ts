@@ -60,6 +60,7 @@ export default defineConfig({
         "./src/**/*.d.ts",
         "./src/**/*.json",
       ],
+      exclude: ["**/__tests__/**"],
       outDir: "./types",
     }),
   ],
