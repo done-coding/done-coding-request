@@ -41,7 +41,7 @@ export const createRequest = <S>({
     timeout,
     issue: async ({ TIMEOUT, url, DEBUG: debug, ...otherConfig }) => {
       const configInit: UniNamespace.RequestOptions = {
-        url: `${basePath}${url}`,
+        url,
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
       };
@@ -77,6 +77,15 @@ export const createRequest = <S>({
         return Promise.reject(errorInfo);
       }
 
+      const { url: configUrl } = config;
+      let configUrlFinal = "";
+      const urlReg = /^https?/;
+      if (urlReg.test(configUrl)) {
+        configUrlFinal = configUrl;
+      } else {
+        configUrlFinal = `${basePath}${configUrl}`;
+      }
+
       return callback2Promise<
         Response<S>,
         UniApp.GeneralCallbackResult,
@@ -84,6 +93,7 @@ export const createRequest = <S>({
       >(({ success, fail }) => {
         uni.request({
           ...config,
+          url: configUrlFinal,
           success,
           fail,
         });
@@ -114,41 +124,61 @@ export const createRequest = <S>({
             return Promise.reject(err);
           }
 
-          const {
-            errMsg: message,
-            errno,
-            errCode,
-            errNo,
-            error,
-          } = err as UniApp.GeneralCallbackResult & {
-            /**
-             * 微信未来标准code
-             */
-            errno?: number;
-            /**
-             * 微信已存在code
-             */
-            errCode?: number;
+          const { errMsg, errno, errCode, errNo, error } =
+            err as UniApp.GeneralCallbackResult & {
+              /**
+               * 微信未来标准code
+               */
+              errno?: number;
+              /**
+               * 微信已存在code
+               */
+              errCode?: number;
 
-            /**
-             * 抖音小程序标准错误码
-             */
-            errNo?: number;
+              /**
+               * 抖音小程序标准错误码
+               */
+              errNo?: number;
 
-            /**
-             * 支付宝小程序标准错误码
-             */
-            error?: number;
-          };
+              /**
+               * 支付宝小程序标准错误码
+               */
+              error?: number;
+            };
+
+          let message = String(errMsg || "").trim() || "请求失败";
           let code: RequestFailResult["code"];
           // https://developers.weixin.qq.com/miniprogram/dev/framework/usability/PublicErrno.html
           // #ifdef MP-WEIXIN
           code = errno ?? errCode ?? InnerErrorCode.NO_NETWORK_CODE;
-
+          switch (message) {
+            case "request:fail timeout": {
+              message = "请求超时";
+              code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+              break;
+            }
+            case "request:fail": {
+              message = "请求失败";
+              break;
+            }
+            default: {
+              message = message.replace("request:fail", "请求失败:");
+            }
+          }
           // #endif
 
           // #ifdef MP-TOUTIAO
           code = errNo ?? InnerErrorCode.NO_NETWORK_CODE;
+          switch (code) {
+            case 21103: {
+              message = "请求超时";
+              code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+              break;
+            }
+            default: {
+              message = message.replace("request:fail", "请求失败:");
+            }
+          }
           // #endif
 
           // #ifdef MP-ALIPAY
@@ -162,6 +192,10 @@ export const createRequest = <S>({
             errNo ||
             error ||
             InnerErrorCode.NO_NETWORK_CODE;
+          if (message.includes("timeout") || message.includes("time out")) {
+            message = "请求超时";
+            code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+          }
           // #endif
 
           const errorInfo: RequestFailResult = new RequestFailResultNetwork({
