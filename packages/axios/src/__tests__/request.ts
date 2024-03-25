@@ -3,8 +3,6 @@ import { createRequest } from "..";
 export enum SceneUrlEnum {
   /** 请求前出错 */
   FAIL_BEFORE_REQUEST = "/get/fail/beforeRequest",
-  /** 请求前出错2 */
-  FAIL_BEFORE_REQUEST_2 = "/get/fail/beforeRequest2",
   /** 请求前超时 */
   FAIL_TIMEOUT = "/get/fail/timeout",
   /** 请求断网 */

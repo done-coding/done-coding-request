@@ -23,12 +23,6 @@ const requestConfig: Parameters<typeof getRequest>[0] = {
     if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST) {
       throw new Error("请求前出错测试");
     }
-    // else if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST_2) {
-    //   throw new RequestFailResultNetwork({
-    //     code: InnerErrorCode.REQUEST_ERROR,
-    //     message: config.params.message,
-    //   });
-    // }
     return config;
   },
   beforeError: (error, { apiConfig: { url } }) => {
