@@ -56,9 +56,6 @@ importers:
       '@done-coding/request-base':
         specifier: workspace:^
         version: link:../base
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@types/jsdom':
         specifier: ^21.1.6
@@ -81,6 +78,9 @@ importers:
       jsdom:
         specifier: ^23.0.1
         version: 23.2.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       msw:
         specifier: ^2.2.8
         version: 2.2.8(typescript@5.3.3)
@@ -101,10 +101,6 @@ importers:
         version: 1.1.1(@types/node@18.19.4)(jsdom@23.2.0)
 
   packages/base:
-    dependencies:
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@types/jsdom':
         specifier: ^21.1.6
@@ -124,6 +120,9 @@ importers:
       jsdom:
         specifier: ^23.0.1
         version: 23.2.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       rimraf:
         specifier: ^5.0.1
         version: 5.0.5
@@ -145,9 +144,6 @@ importers:
       '@done-coding/request-base':
         specifier: workspace:^
         version: link:../base
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
     devDependencies:
       '@dcloudio/types':
         specifier: ^3.4.8
@@ -173,6 +169,9 @@ importers:
       jsdom:
         specifier: ^23.0.1
         version: 23.2.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       msw:
         specifier: ^2.2.8
         version: 2.2.8(typescript@5.3.3)
@@ -187,13 +186,13 @@ importers:
         version: 0.0.1(@dcloudio/types@3.4.8)(@vue/composition-api@1.7.2)(postcss@8.4.38)(typescript@5.3.3)(vite@5.0.10)
       vite:
         specifier: ^5.0.10
-        version: 5.0.10
+        version: 5.0.10(@types/node@18.19.4)
       vite-plugin-dts:
         specifier: ^3.7.0
-        version: 3.7.0(typescript@5.3.3)(vite@5.0.10)
+        version: 3.7.0(@types/node@18.19.4)(typescript@5.3.3)(vite@5.0.10)
       vitest:
         specifier: ^1.1.1
-        version: 1.1.1(jsdom@23.2.0)
+        version: 1.1.1(@types/node@18.19.4)(jsdom@23.2.0)
 
 packages:
 
@@ -254,7 +253,7 @@ packages:
       '@babel/traverse': 7.23.7
       '@babel/types': 7.23.6
       convert-source-map: 2.0.0
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -426,7 +425,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.22.6
       '@babel/parser': 7.23.6
       '@babel/types': 7.23.6
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -629,7 +628,7 @@ packages:
       '@dcloudio/uni-app-uts': 3.0.0-3081220230817001(postcss@8.4.38)(vue@3.4.21)
       '@dcloudio/uni-app-vite': 3.0.0-3081220230817001(postcss@8.4.38)(vite@5.0.10)(vue@3.4.21)
       '@dcloudio/uni-app-vue': 3.0.0-3081220230817001
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       fs-extra: 10.1.0
       licia: 1.39.2
       postcss-selector-parser: 6.0.16
@@ -654,7 +653,7 @@ packages:
       '@vue/compiler-core': 3.2.47
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       es-module-lexer: 1.4.2
       fs-extra: 10.1.0
       picocolors: 1.0.0
@@ -677,7 +676,7 @@ packages:
       '@vitejs/plugin-vue': 4.6.2(vite@5.0.10)(vue@3.4.21)
       '@vue/compiler-dom': 3.2.47
       '@vue/compiler-sfc': 3.2.47
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       fs-extra: 10.1.0
       picocolors: 1.0.0
     transitivePeerDependencies:
@@ -745,7 +744,7 @@ packages:
       base64url: 3.0.1
       chokidar: 3.6.0
       compare-versions: 3.6.0
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       es-module-lexer: 1.4.2
       esbuild: 0.17.19
       estree-walker: 2.0.2
@@ -811,7 +810,7 @@ packages:
       '@vue/compiler-sfc': 3.2.47
       '@vue/server-renderer': 3.2.47(vue@3.4.21)
       '@vue/shared': 3.2.47
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       fs-extra: 10.1.0
       mime: 3.0.0
       module-alias: 2.2.3
@@ -840,7 +839,7 @@ packages:
       '@dcloudio/uni-shared': 3.0.0-3081220230817001
       '@vue/server-renderer': 3.2.47(vue@3.4.21)
       '@vue/shared': 3.2.47
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       localstorage-polyfill: 1.0.1
       postcss-selector-parser: 6.0.16
       safe-area-insets: 1.4.1
@@ -1014,7 +1013,7 @@ packages:
       '@dcloudio/uni-shared': 3.0.0-3081220230817001
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
     transitivePeerDependencies:
       - postcss
       - supports-color
@@ -1096,7 +1095,7 @@ packages:
     dependencies:
       '@dcloudio/uni-cli-shared': 3.0.0-3081220230817001(postcss@8.4.38)(vue@3.4.21)
       '@dcloudio/uni-shared': 3.0.0-3081220230817001
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
     transitivePeerDependencies:
       - postcss
       - supports-color
@@ -2244,42 +2243,12 @@ packages:
       - typescript
     dev: true
 
-  /@microsoft/api-extractor-model@7.28.3:
-    resolution: {integrity: sha512-wT/kB2oDbdZXITyDh2SQLzaWwTOFbV326fP0pUwNW00WeliARs0qjmXBWmGWardEzp2U3/axkO3Lboqun6vrig==}
-    dependencies:
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 3.62.0
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
   /@microsoft/api-extractor-model@7.28.3(@types/node@18.19.4):
     resolution: {integrity: sha512-wT/kB2oDbdZXITyDh2SQLzaWwTOFbV326fP0pUwNW00WeliARs0qjmXBWmGWardEzp2U3/axkO3Lboqun6vrig==}
     dependencies:
       '@microsoft/tsdoc': 0.14.2
       '@microsoft/tsdoc-config': 0.16.2
       '@rushstack/node-core-library': 3.62.0(@types/node@18.19.4)
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
-  /@microsoft/api-extractor@7.39.0:
-    resolution: {integrity: sha512-PuXxzadgnvp+wdeZFPonssRAj/EW4Gm4s75TXzPk09h3wJ8RS3x7typf95B4vwZRrPTQBGopdUl+/vHvlPdAcg==}
-    hasBin: true
-    dependencies:
-      '@microsoft/api-extractor-model': 7.28.3
-      '@microsoft/tsdoc': 0.14.2
-      '@microsoft/tsdoc-config': 0.16.2
-      '@rushstack/node-core-library': 3.62.0
-      '@rushstack/rig-package': 0.5.1
-      '@rushstack/ts-command-line': 4.17.1
-      colors: 1.2.5
-      lodash: 4.17.21
-      resolve: 1.22.6
-      semver: 7.5.4
-      source-map: 0.6.1
-      typescript: 5.3.3
     transitivePeerDependencies:
       - '@types/node'
     dev: true
@@ -2849,23 +2818,6 @@ packages:
     dev: true
     optional: true
 
-  /@rushstack/node-core-library@3.62.0:
-    resolution: {integrity: sha512-88aJn2h8UpSvdwuDXBv1/v1heM6GnBf3RjEy6ZPP7UnzHNCqOHA2Ut+ScYUbXcqIdfew9JlTAe3g+cnX9xQ/Aw==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      colors: 1.2.5
-      fs-extra: 7.0.1
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.6
-      semver: 7.5.4
-      z-schema: 5.0.5
-    dev: true
-
   /@rushstack/node-core-library@3.62.0(@types/node@18.19.4):
     resolution: {integrity: sha512-88aJn2h8UpSvdwuDXBv1/v1heM6GnBf3RjEy6ZPP7UnzHNCqOHA2Ut+ScYUbXcqIdfew9JlTAe3g+cnX9xQ/Aw==}
     peerDependencies:
@@ -3195,7 +3147,7 @@ packages:
       vite: ^4.0.0 || ^5.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 5.0.10
+      vite: 5.0.10(@types/node@18.19.4)
       vue: 3.4.21(typescript@5.3.3)
     dev: true
 
@@ -3204,7 +3156,7 @@ packages:
     peerDependencies:
       vitest: ^1.0.0
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-instrument: 6.0.1
       istanbul-lib-report: 3.0.1
@@ -3213,7 +3165,7 @@ packages:
       magicast: 0.3.2
       picocolors: 1.0.0
       test-exclude: 6.0.0
-      vitest: 1.1.1(jsdom@23.2.0)
+      vitest: 1.1.1(@types/node@18.19.4)(jsdom@23.2.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3532,7 +3484,7 @@ packages:
     resolution: {integrity: sha512-o/zjMZRhJxny7OyEF+Op8X+efiELC7k7yOjMzgfzVqOzXqkBkWI79YoTdOtsuWd5BWhAGAuOY/Xa6xpiaWXiNg==}
     engines: {node: '>= 14'}
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4549,18 +4501,6 @@ packages:
 
   /de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
-    dev: true
-
-  /debug@4.3.4:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.2
     dev: true
 
   /debug@4.3.4(supports-color@9.4.0):
@@ -5631,7 +5571,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.0
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5652,7 +5592,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.0
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6020,7 +5960,7 @@ packages:
     resolution: {integrity: sha512-n3s8EwkdFIJCG3BPKBYvskgXGoy88ARzvegkitk60NxRdwltLOTaH7CUiMRXvwYorl0Q712iEjcWB+fK/MrWVw==}
     engines: {node: '>=10'}
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@9.4.0)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -6515,6 +6455,7 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
@@ -9207,27 +9148,6 @@ packages:
     engines: {node: '>= 0.10'}
     dev: true
 
-  /vite-node@1.1.1:
-    resolution: {integrity: sha512-2bGE5w4jvym5v8llF6Gu1oBrmImoNSs4WmRVcavnG2me6+8UQntTqLiAMFyiAobp+ZXhj5ZFhI7SmLiFr/jrow==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    dependencies:
-      cac: 6.7.14
-      debug: 4.3.4
-      pathe: 1.1.1
-      picocolors: 1.0.0
-      vite: 5.0.10
-    transitivePeerDependencies:
-      - '@types/node'
-      - less
-      - lightningcss
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-    dev: true
-
   /vite-node@1.1.1(@types/node@18.19.4):
     resolution: {integrity: sha512-2bGE5w4jvym5v8llF6Gu1oBrmImoNSs4WmRVcavnG2me6+8UQntTqLiAMFyiAobp+ZXhj5ZFhI7SmLiFr/jrow==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -9271,65 +9191,6 @@ packages:
       - '@types/node'
       - rollup
       - supports-color
-    dev: true
-
-  /vite-plugin-dts@3.7.0(typescript@5.3.3)(vite@5.0.10):
-    resolution: {integrity: sha512-np1uPaYzu98AtPReB8zkMnbjwcNHOABsLhqVOf81b3ol9b5M2wPcAVs8oqPnOpr6Us+7yDXVauwkxsk5+ldmRA==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      typescript: '*'
-      vite: '*'
-    peerDependenciesMeta:
-      vite:
-        optional: true
-    dependencies:
-      '@microsoft/api-extractor': 7.39.0
-      '@rollup/pluginutils': 5.1.0
-      '@vue/language-core': 1.8.27(typescript@5.3.3)
-      debug: 4.3.4
-      kolorist: 1.8.0
-      typescript: 5.3.3
-      vite: 5.0.10
-      vue-tsc: 1.8.27(typescript@5.3.3)
-    transitivePeerDependencies:
-      - '@types/node'
-      - rollup
-      - supports-color
-    dev: true
-
-  /vite@5.0.10:
-    resolution: {integrity: sha512-2P8J7WWgmc355HUMlFrwofacvr98DAjoE52BfdbwQtyLH06XKwaL/FMnmKM2crF0iX4MpmMKoDlNCB1ok7zHCw==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || >=20.0.0
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.19.11
-      postcss: 8.4.32
-      rollup: 4.9.2
-    optionalDependencies:
-      fsevents: 2.3.3
     dev: true
 
   /vite@5.0.10(@types/node@18.19.4):
@@ -9415,63 +9276,6 @@ packages:
       tinypool: 0.8.1
       vite: 5.0.10(@types/node@18.19.4)
       vite-node: 1.1.1(@types/node@18.19.4)
-      why-is-node-running: 2.2.2
-    transitivePeerDependencies:
-      - less
-      - lightningcss
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-    dev: true
-
-  /vitest@1.1.1(jsdom@23.2.0):
-    resolution: {integrity: sha512-Ry2qs4UOu/KjpXVfOCfQkTnwSXYGrqTbBZxw6reIYEFjSy1QUARRg5pxiI5BEXy+kBVntxUYNMlq4Co+2vD3fQ==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@edge-runtime/vm': '*'
-      '@types/node': ^18.0.0 || >=20.0.0
-      '@vitest/browser': ^1.0.0
-      '@vitest/ui': ^1.0.0
-      happy-dom: '*'
-      jsdom: '*'
-    peerDependenciesMeta:
-      '@edge-runtime/vm':
-        optional: true
-      '@types/node':
-        optional: true
-      '@vitest/browser':
-        optional: true
-      '@vitest/ui':
-        optional: true
-      happy-dom:
-        optional: true
-      jsdom:
-        optional: true
-    dependencies:
-      '@vitest/expect': 1.1.1
-      '@vitest/runner': 1.1.1
-      '@vitest/snapshot': 1.1.1
-      '@vitest/spy': 1.1.1
-      '@vitest/utils': 1.1.1
-      acorn-walk: 8.3.1
-      cac: 6.7.14
-      chai: 4.3.10
-      debug: 4.3.4
-      execa: 8.0.1
-      jsdom: 23.2.0
-      local-pkg: 0.5.0
-      magic-string: 0.30.5
-      pathe: 1.1.1
-      picocolors: 1.0.0
-      std-env: 3.7.0
-      strip-literal: 1.3.0
-      tinybench: 2.5.1
-      tinypool: 0.8.1
-      vite: 5.0.10
-      vite-node: 1.1.1
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
