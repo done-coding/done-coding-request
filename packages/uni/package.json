@@ -36,6 +36,7 @@
     "@vitest/coverage-istanbul": "^1.1.1",
     "csstype": "^3.1.2",
     "jsdom": "^23.0.1",
+    "lodash": "^4.17.21",
     "msw": "^2.2.8",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
@@ -46,10 +47,10 @@
   },
   "sideEffects": [],
   "dependencies": {
-    "@done-coding/request-base": "workspace:^",
-    "lodash": "^4.17.21"
+    "@done-coding/request-base": "workspace:^"
   },
   "peerDependencies": {
-    "@dcloudio/uni-app": "^2.0.0"
+    "@dcloudio/uni-app": "^2.0.0",
+    "lodash": "^4.17.21"
   }
 }
