@@ -87,12 +87,16 @@ export const dispatchBusinessResult = <R, D = any>(
 };
 
 /** 回调请求转Promise */
-export const callback2Promise = <S, E>(
-  fn: (res: { success: (res: S) => void; fail: (res: E) => void }) => unknown,
+export const callback2Promise = <S, E, PS = S>(
+  fn: (data: { success: (res: PS) => void; fail: (res: E) => void }) => unknown,
 ): Promise<S> => {
   return new Promise((resolve, reject) => {
-    const success = (res: S) => resolve(res);
-    const fail = (res: E) => reject(res);
+    const success = (res: PS) => {
+      return resolve(res as unknown as S);
+    };
+    const fail = (err: E) => {
+      return reject(err);
+    };
     fn({
       success,
       fail,
