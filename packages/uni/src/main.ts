@@ -13,6 +13,7 @@ import {
 
 import { createRequest as createRequestBase } from "@done-coding/request-base";
 import _omit from "lodash/omit";
+import _get from "lodash/get";
 
 export * from "@done-coding/request-base";
 
@@ -195,6 +196,13 @@ export const createRequest = <S>({
           if (message.includes("timeout") || message.includes("time out")) {
             message = "请求超时";
             code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
+          } else {
+            // #ifdef WEB
+            if (_get(globalThis, "navigator.onLine") === false) {
+              message = "网络未连接";
+              code = InnerErrorCode.NO_RESPONSE_OFFLINE;
+            }
+            // #endif
           }
           // #endif
 
