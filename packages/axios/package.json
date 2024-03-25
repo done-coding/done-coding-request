@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-axios",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "请求axios配置",
   "main": "lib/index.js",
   "module": "es/index.js",
