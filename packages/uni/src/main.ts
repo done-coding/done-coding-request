@@ -16,22 +16,25 @@ import _omit from "lodash/omit";
 
 export * from "@done-coding/request-base";
 
-export const createRequest = ({
+export type Response<S> = Omit<UniApp.RequestSuccessCallbackResult, "data"> & {
+  data: S;
+};
+
+export const createRequest = <S>({
   basePath,
   timeout,
   beforeRequest = (config) => config,
+  networkSuccessCodeList = [200],
   ...otherOpt
-}: Omit<
-  Options<UniNamespace.RequestOptions, UniApp.RequestSuccessCallbackResult>,
-  "issue"
-> & {
+}: Omit<Options<UniNamespace.RequestOptions, Response<S>>, "issue"> & {
   beforeRequest?: (
     config: UniNamespace.RequestOptions,
   ) => UniNamespace.RequestOptions | Promise<UniNamespace.RequestOptions>;
+  networkSuccessCodeList?: number[];
 }) => {
   const { request } = createRequestBase<
     UniNamespace.RequestOptions,
-    UniApp.RequestSuccessCallbackResult
+    Response<S>
   >({
     ...otherOpt,
     basePath,
@@ -47,12 +50,6 @@ export const createRequest = ({
       try {
         config = await beforeRequest(configInit);
       } catch (error) {
-        debug &&
-          createDebugInfo(
-            { stage: DebugStageEnum.BEFORE_ERROR, data: error },
-            DebugLevelEnum.ERROR,
-          );
-
         if (error instanceof RequestFailResultBase) {
           debug &&
             createDebugInfo(
@@ -81,8 +78,9 @@ export const createRequest = ({
       }
 
       return callback2Promise<
-        UniApp.RequestSuccessCallbackResult,
-        UniApp.GeneralCallbackResult
+        Response<S>,
+        UniApp.GeneralCallbackResult,
+        UniApp.RequestSuccessCallbackResult
       >(({ success, fail }) => {
         uni.request({
           ...config,
@@ -90,16 +88,31 @@ export const createRequest = ({
           fail,
         });
       })
-        .then((res) => dispatchBusinessResult(res, otherOpt))
+        .then((res) => {
+          const { statusCode: code } = res;
+          if (networkSuccessCodeList.includes(code)) {
+            return dispatchBusinessResult(res, otherOpt);
+          } else {
+            const { errMsg = `${code}` } = res;
+            throw new RequestFailResultNetwork({
+              code,
+              message: errMsg,
+              cause: res,
+            });
+          }
+        })
         .catch((err) => {
-          debug &&
-            createDebugInfo(
-              {
-                stage: DebugStageEnum.NETWORK_ERROR,
-                data: err,
-              },
-              DebugLevelEnum.ERROR,
-            );
+          if (err instanceof RequestFailResultBase) {
+            debug &&
+              createDebugInfo(
+                {
+                  stage: DebugStageEnum.NETWORK_ERROR_ORIGIN,
+                  data: err,
+                },
+                DebugLevelEnum.ERROR,
+              );
+            return Promise.reject(err);
+          }
 
           const {
             errMsg: message,
