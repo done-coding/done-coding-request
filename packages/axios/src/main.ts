@@ -26,6 +26,11 @@ export const createRequest = <S>({
   basePath,
   timeout,
   beforeRequest = (config) => config,
+  networkSuccessCodeList,
+  isSuccessNetworkCode = (code) =>
+    Array.isArray(networkSuccessCodeList)
+      ? networkSuccessCodeList.includes(code)
+      : code >= 200 && code < 300,
   instanceCreateConfig = {},
   ...otherOpt
 }: Omit<Options<AxiosRequestConfig, AxiosResponse<S>>, "issue"> & {
@@ -33,12 +38,16 @@ export const createRequest = <S>({
     AxiosInterceptorManager<InternalAxiosRequestConfig>["use"]
   >[0];
   /** 示例创建选项 */
-  instanceCreateConfig?: Omit<CreateAxiosDefaults, "baseURL" | "timeout">;
+  instanceCreateConfig?: Omit<
+    CreateAxiosDefaults,
+    "baseURL" | "timeout" | "validateStatus"
+  >;
 }) => {
   const instance = axios.create({
     baseURL: basePath,
     timeout,
     ...instanceCreateConfig,
+    validateStatus: isSuccessNetworkCode,
   });
 
   instance.interceptors.request.use(beforeRequest, (error) => {

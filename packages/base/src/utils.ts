@@ -21,7 +21,8 @@ export const dispatchBusinessResult = <R, D = any>(
     getBusinessCode,
     getBusinessMsg,
     getBusinessData,
-    businessSuccessCodeList,
+    businessSuccessCodeList = [200],
+    isSuccessBusinessCode,
   }: BusinessOptions<R>,
   debug?: boolean,
 ): RequestResult<D> | Promise<RequestResult<D>> => {
@@ -34,7 +35,11 @@ export const dispatchBusinessResult = <R, D = any>(
     // !!!所有外部传入的function都需要try catch
     const code = getBusinessCode(res);
     const message = getBusinessMsg(res);
-    if (businessSuccessCodeList.includes(code)) {
+    if (
+      isSuccessBusinessCode
+        ? isSuccessBusinessCode(code)
+        : businessSuccessCodeList.includes(code)
+    ) {
       const info: RequestResult<D> = {
         code,
         data: getBusinessData(res),

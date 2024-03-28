@@ -25,13 +25,16 @@ export const createRequest = <S>({
   basePath,
   timeout,
   beforeRequest = (config) => config,
-  networkSuccessCodeList = [200],
+  networkSuccessCodeList,
+  isSuccessNetworkCode = (code) =>
+    Array.isArray(networkSuccessCodeList)
+      ? networkSuccessCodeList.includes(code)
+      : code >= 200 && code < 300,
   ...otherOpt
 }: Omit<Options<UniNamespace.RequestOptions, Response<S>>, "issue"> & {
   beforeRequest?: (
     config: UniNamespace.RequestOptions,
   ) => UniNamespace.RequestOptions | Promise<UniNamespace.RequestOptions>;
-  networkSuccessCodeList?: number[];
 }) => {
   const { request } = createRequestBase<
     UniNamespace.RequestOptions,
@@ -101,7 +104,7 @@ export const createRequest = <S>({
       })
         .then((res) => {
           const { statusCode: code } = res;
-          if (networkSuccessCodeList.includes(code)) {
+          if (isSuccessNetworkCode(code)) {
             return dispatchBusinessResult(res, otherOpt);
           } else {
             const { errMsg = `${code}` } = res;

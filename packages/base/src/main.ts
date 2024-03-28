@@ -55,7 +55,12 @@ export interface BusinessOptions<R> {
   /** 获取业务数据 */
   getBusinessData: <D = unknown>(res: R) => D;
   /** 业务成功状态码列表 */
-  businessSuccessCodeList: number[];
+  businessSuccessCodeList?: number[];
+  /**
+   * 是否是成功的业务码
+   * 优先级高于businessSuccessCodeList
+   */
+  isSuccessBusinessCode?: (code: number) => boolean;
 }
 
 /**
@@ -102,6 +107,13 @@ export interface Options<C extends ApiConfigBase, R>
   ) => BeforeErrorResult | Promise<BeforeErrorResult>;
   /** 展示提示 */
   showToast?: (message: string) => void;
+  /** 成功的网络状态码 */
+  networkSuccessCodeList?: number[];
+  /**
+   * 是否是成功的网络状态码
+   * 优先级高于networkSuccessCodeList
+   */
+  isSuccessNetworkCode?: (code: number) => boolean;
 }
 
 /** dealError错误捕捉 */
