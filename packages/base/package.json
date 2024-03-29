@@ -41,8 +41,8 @@
     "vite-plugin-dts": "^3.7.0",
     "vitest": "^1.1.1"
   },
-  "sideEffects": [],
-  "peerDependencies": {
+  "dependencies": {
     "lodash": "^4.17.21"
-  }
+  },
+  "sideEffects": []
 }

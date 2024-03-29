@@ -4,7 +4,6 @@ import { defineConfig } from "vite";
 import path from "node:path";
 import dts from "vite-plugin-dts";
 import pkg from "./package.json";
-import lodash from "lodash";
 
 const isPro = process.env.NODE_ENV === "production";
 
@@ -12,11 +11,7 @@ const build = {
   minify: isPro,
   emptyOutDir: true,
   rollupOptions: {
-    external: [
-      ...Object.keys(lodash).map((key) => `lodash/${key}`),
-      // ...Object.keys(pkg.dependencies),
-      ...Object.keys(pkg.peerDependencies || {}),
-    ],
+    external: [...Object.keys(pkg.peerDependencies || {})],
     input: ["src/index.ts"],
     output: [
       {

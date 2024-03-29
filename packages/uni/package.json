@@ -47,10 +47,10 @@
   },
   "sideEffects": [],
   "dependencies": {
-    "@done-coding/request-base": "workspace:^"
+    "@done-coding/request-base": "workspace:^",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
-    "@dcloudio/uni-app": "^2.0.0",
-    "lodash": "^4.17.21"
+    "@dcloudio/uni-app": "^2.0.0"
   }
 }

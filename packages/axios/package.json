@@ -45,9 +45,7 @@
   },
   "sideEffects": [],
   "dependencies": {
-    "@done-coding/request-base": "workspace:^"
-  },
-  "peerDependencies": {
+    "@done-coding/request-base": "workspace:^",
     "axios": "^1.6.7",
     "lodash": "^4.17.21"
   }
