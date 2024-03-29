@@ -10,13 +10,13 @@ import {
   resolveErrorMsg,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import axios, { AxiosError } from "axios";
 import type {
   InternalAxiosRequestConfig,
   AxiosResponse,
   AxiosInterceptorManager,
   CreateAxiosDefaults,
   AxiosRequestConfig,
+  AxiosStatic,
 } from "axios";
 import _omit from "lodash/omit";
 import _get from "lodash/get";
@@ -32,6 +32,7 @@ export const createRequest = <S>({
       ? networkSuccessCodeList.includes(code)
       : code >= 200 && code < 300,
   instanceCreateConfig = {},
+  axios,
   ...otherOpt
 }: Omit<Options<AxiosRequestConfig, AxiosResponse<S>>, "issue"> & {
   beforeRequest?: Parameters<
@@ -42,6 +43,8 @@ export const createRequest = <S>({
     CreateAxiosDefaults,
     "baseURL" | "timeout" | "validateStatus"
   >;
+  /** 考虑@nuxtjs/axios axios外传 */
+  axios: AxiosStatic;
 }) => {
   const instance = axios.create({
     baseURL: basePath,
@@ -86,7 +89,7 @@ export const createRequest = <S>({
             return Promise.reject(err);
           }
           // https://www.axios-http.cn/docs/handling_errors
-          const { response, request } = err as AxiosError;
+          const { response, request } = err;
           let code: RequestFailResult["code"];
           let message: string;
           if (response) {
@@ -96,7 +99,7 @@ export const createRequest = <S>({
           } else if (request) {
             // 请求已经成功发起，但没有收到响应
             code = InnerErrorCode.NO_RESPONSE;
-            if (err instanceof AxiosError) {
+            if (axios.isAxiosError(err)) {
               if (err.message.includes("timeout of")) {
                 code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
                 message = "请求超时";
