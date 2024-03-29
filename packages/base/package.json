@@ -5,6 +5,9 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "types": "types/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "lib",
     "es",
@@ -44,5 +47,6 @@
   "dependencies": {
     "lodash": "^4.17.21"
   },
-  "sideEffects": []
+  "sideEffects": [],
+  "gitHead": "b7d43c930cf1846c006a76498b321ef349b9fb42"
 }
