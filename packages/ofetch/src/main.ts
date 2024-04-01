@@ -10,8 +10,9 @@ import {
   resolveErrorMsg,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import type { $Fetch, FetchOptions, FetchContext, FetchResponse } from "ofetch";
+import type { $Fetch, FetchContext } from "ofetch";
 import _omit from "lodash/omit";
+import type { FetchOptions, FetchResponse } from "./types";
 export * from "@done-coding/request-base";
 
 export interface XFetchOptions extends FetchOptions {
@@ -56,7 +57,8 @@ export const createRequest = <S>({
     timeout,
     ...instanceCreateConfig,
     onRequest: async (context) => {
-      const { options: optionsInit, request: url } = context;
+      const { options: optionsInit, request } = context;
+      const url = request as unknown as string;
       const options = await beforeRequest({
         ...optionsInit,
         url,

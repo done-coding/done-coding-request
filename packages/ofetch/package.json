@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-ofetch",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "请求ofetch配置 支持nuxt",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -39,7 +39,6 @@
     "jsdom": "^23.0.1",
     "lodash": "^4.17.21",
     "msw": "^2.2.8",
-    "ofetch": "^1.3.4",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.10",
@@ -49,6 +48,7 @@
   "sideEffects": [],
   "dependencies": {
     "@done-coding/request-base": "workspace:^",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "ofetch": "^1.3.4"
   }
 }
