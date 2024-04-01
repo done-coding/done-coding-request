@@ -37,7 +37,7 @@ export const createRequest = <S>({
   beforeRequest?: Parameters<
     AxiosInterceptorManager<InternalAxiosRequestConfig>["use"]
   >[0];
-  /** 示例创建选项 */
+  /** 实例创建选项 */
   instanceCreateConfig?: Omit<
     CreateAxiosDefaults,
     "baseURL" | "timeout" | "validateStatus"

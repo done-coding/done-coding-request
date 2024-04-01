@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example</title>
+</head>
+
+<body>
+  <script type="module">
+    import {
+      getRequest,
+      SceneUrlEnum
+    } from './src/__tests__/request.ts';
+
+
+    const request = getRequest({
+      beforeRequest: (config) => {
+        if (config.url === SceneUrlEnum.FAIL_BEFORE_REQUEST) {
+          throw new Error("请求前出错测试");
+        }
+        return config;
+      }
+    })
+
+    const sendRequest = (method, url) => {
+      request({
+        url,
+        method,
+        data: {
+          name: 'test'
+        },
+        params: {
+          id: 1
+        }
+      })
+    }
+
+    Object.keys(SceneUrlEnum).filter(item => !item.startsWith('/')).forEach((key) => {
+      ['post', 'get'].forEach((method) => {
+
+        const url = SceneUrlEnum[key]
+        const btn = document.createElement('button')
+        btn.setAttribute('type', 'button')
+        btn.style.display = 'block'
+        btn.innerText = `${method} ${key}`
+        btn.onclick = () => sendRequest(method, url)
+        document.body.appendChild(btn)
+
+      })
+    })
+  </script>
+</body>
+
+</html>
