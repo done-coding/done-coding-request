@@ -34,7 +34,3 @@ export interface FetchOptions {
   /** Default is [408, 409, 425, 429, 500, 502, 503, 504] */
   retryStatusCodes?: number[];
 }
-
-export interface FetchResponse<S> {
-  _data: S;
-}

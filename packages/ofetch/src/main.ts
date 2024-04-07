@@ -10,17 +10,13 @@ import {
   resolveErrorMsg,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import type { $Fetch, FetchContext } from "ofetch";
+import type { $Fetch } from "ofetch";
 import _omit from "lodash/omit";
-import type { FetchOptions, FetchResponse } from "./types";
+import type { FetchOptions } from "./types";
 export * from "@done-coding/request-base";
 
 export interface XFetchOptions extends FetchOptions {
   url: string;
-}
-
-export interface XFetchResponse<S> extends FetchResponse<S> {
-  data: S;
 }
 
 export const createRequest = <S>({
@@ -35,7 +31,7 @@ export const createRequest = <S>({
   Fetch,
   instanceCreateConfig = {},
   ...otherOpt
-}: Omit<Options<XFetchOptions, XFetchResponse<S>>, "issue"> & {
+}: Omit<Options<XFetchOptions, S>, "issue"> & {
   beforeRequest?: (
     config: XFetchOptions,
   ) => XFetchOptions | Promise<XFetchOptions>;
@@ -63,6 +59,7 @@ export const createRequest = <S>({
         ...optionsInit,
         url,
       });
+      context.request = options.url;
       context.options = _omit(options, "url");
     },
     onResponseError: async (error) => {
@@ -87,7 +84,7 @@ export const createRequest = <S>({
     // onRequestError: async (context) => {},
   });
 
-  const { request } = createRequestBase<XFetchOptions, XFetchResponse<S>>({
+  const { request } = createRequestBase<XFetchOptions, S>({
     ...otherOpt,
     basePath,
     timeout,
@@ -96,24 +93,7 @@ export const createRequest = <S>({
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
       })
-        .then(
-          (
-            res: FetchContext & {
-              response: FetchResponse<S>;
-            },
-          ) => {
-            const { response } = res;
-
-            return dispatchBusinessResult(
-              {
-                ...response,
-                data: response._data,
-              },
-              otherOpt,
-              debug,
-            );
-          },
-        )
+        .then((res) => dispatchBusinessResult(res, otherOpt, debug))
         .catch((err) => {
           if (err instanceof RequestFailResultBase) {
             debug &&
