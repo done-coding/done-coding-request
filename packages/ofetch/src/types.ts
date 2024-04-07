@@ -33,4 +33,5 @@ export interface FetchOptions {
   retryDelay?: number;
   /** Default is [408, 409, 425, 429, 500, 502, 503, 504] */
   retryStatusCodes?: number[];
+  method?: string;
 }
