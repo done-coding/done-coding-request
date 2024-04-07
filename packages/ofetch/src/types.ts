@@ -14,6 +14,7 @@ type ResponseType = keyof ResponseMap | "json";
 export interface FetchOptions {
   baseURL?: string;
   body?: RequestInit["body"] | Record<string, any>;
+  headers?: HeadersInit;
   ignoreResponseError?: boolean;
   params?: Record<string, any>;
   query?: Record<string, any>;
