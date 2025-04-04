@@ -11,7 +11,7 @@ import {
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
 import type { $Fetch } from "ofetch";
-import _omit from "lodash/omit";
+import _omit from "lodash.omit";
 import type { FetchOptions } from "./types";
 export * from "@done-coding/request-base";
 

@@ -56,7 +56,14 @@
     "[dotenv]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
     },
-    "cSpell.words": ["commitlint", "csstype", "preinstall", "unplugin", "VITE"],
+    "cSpell.words": [
+      "commitlint",
+      "csstype",
+      "ofetch",
+      "preinstall",
+      "unplugin",
+      "VITE"
+    ],
     "[ignore]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
     }

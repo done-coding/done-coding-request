@@ -16,7 +16,7 @@ const build = {
     output: [
       {
         format: "es",
-        entryFileNames: "[name].js",
+        entryFileNames: "[name].mjs",
         // preserveModules: true,
         dir: "./es",
         // preserveModulesRoot: "src",
@@ -24,7 +24,7 @@ const build = {
       {
         format: "cjs",
         exports: "named",
-        entryFileNames: "[name].js",
+        entryFileNames: "[name].cjs",
         // preserveModules: true,
         dir: "./lib",
         // preserveModulesRoot: "src",

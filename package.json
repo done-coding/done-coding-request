@@ -13,10 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/justsosu/reuqest"
+    "url": "git@gitee.com:justsosu/done-coding-request.git"
   },
   "author": "JustSoSu",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",

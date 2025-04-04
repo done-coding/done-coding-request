@@ -2,9 +2,16 @@
   "name": "@done-coding/request-base",
   "version": "0.0.1",
   "description": "请求基本配置",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "main": "lib/index.cjs",
+  "module": "es/index.mjs",
   "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./es/index.mjs",
+      "require": "./lib/index.cjs",
+      "types": "./types/index.d.ts"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -25,19 +32,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/justsosu/request",
+    "url": "git@gitee.com:justsosu/done-coding-request.git",
     "directory": "packages/base"
   },
   "author": "JustSoSu",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
-    "@types/lodash": "^4.14.198",
+    "@types/lodash.assign": "^4.2.9",
+    "@types/lodash.omit": "^4.5.9",
     "@types/qs": "^6.9.9",
     "@vitest/coverage-istanbul": "^1.1.1",
     "csstype": "^3.1.2",
     "jsdom": "^23.0.1",
-    "lodash": "^4.17.21",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.10",
@@ -45,7 +52,8 @@
     "vitest": "^1.1.1"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash.assign": "^4.2.0",
+    "lodash.omit": "^4.5.0"
   },
   "sideEffects": [],
   "gitHead": "b7d43c930cf1846c006a76498b321ef349b9fb42"

@@ -1,4 +1,4 @@
-import { createRequest } from "..";
+import { createRequest } from "@/main";
 import { ofetch } from "ofetch";
 
 export enum SceneUrlEnum {

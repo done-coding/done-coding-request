@@ -1,5 +1,5 @@
 import { RequestFailResultBase } from "./error";
-import _omit from "lodash/omit";
+import _omit from "lodash.omit";
 /**
  * 调试信息级别
  */

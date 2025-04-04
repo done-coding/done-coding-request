@@ -2,9 +2,16 @@
   "name": "@done-coding/request-axios",
   "version": "0.0.2",
   "description": "请求axios配置",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "main": "lib/index.cjs",
+  "module": "es/index.mjs",
   "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./es/index.mjs",
+      "require": "./lib/index.cjs",
+      "types": "./types/index.d.ts"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -25,20 +32,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/justsosu/request",
+    "url": "git@gitee.com:justsosu/done-coding-request.git",
     "directory": "packages/axios"
   },
   "author": "JustSoSu",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
-    "@types/lodash": "^4.14.198",
+    "@types/lodash.get": "^4.4.9",
+    "@types/lodash.omit": "^4.5.9",
     "@types/qs": "^6.9.9",
     "@vitest/coverage-istanbul": "^1.1.1",
     "axios": "^1.6.7",
     "csstype": "^3.1.2",
     "jsdom": "^23.0.1",
-    "lodash": "^4.17.21",
     "msw": "^2.2.8",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
@@ -49,7 +56,10 @@
   "sideEffects": [],
   "dependencies": {
     "@done-coding/request-base": "workspace:^",
-    "axios": "^1.6.7",
-    "lodash": "^4.17.21"
+    "lodash.get": "^4.4.2",
+    "lodash.omit": "^4.5.0"
+  },
+  "peerDependencies": {
+    "axios": "^1.6.7"
   }
 }

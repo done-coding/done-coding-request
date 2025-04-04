@@ -1,4 +1,5 @@
-import { createRequest } from "..";
+import { createRequest } from "@/main";
+import axios from "axios";
 
 export enum SceneUrlEnum {
   /** 请求前出错 */
@@ -59,5 +60,6 @@ export const getRequest = ({
     uiConfig: {
       errorToast: true,
     },
+    axios,
   });
 };

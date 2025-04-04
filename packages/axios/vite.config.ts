@@ -3,6 +3,7 @@ import type { BuildOptions } from "vite";
 import { defineConfig } from "vite";
 import path from "node:path";
 import dts from "vite-plugin-dts";
+import pkg from "./package.json";
 
 const isPro = process.env.NODE_ENV === "production";
 
@@ -10,12 +11,12 @@ const build = {
   minify: isPro,
   emptyOutDir: true,
   rollupOptions: {
-    external: [],
+    external: [...Object.keys(pkg.peerDependencies || {})],
     input: ["src/index.ts"],
     output: [
       {
         format: "es",
-        entryFileNames: "[name].js",
+        entryFileNames: "[name].mjs",
         // preserveModules: true,
         dir: "./es",
         // preserveModulesRoot: "src",
@@ -23,7 +24,7 @@ const build = {
       {
         format: "cjs",
         exports: "named",
-        entryFileNames: "[name].js",
+        entryFileNames: "[name].cjs",
         // preserveModules: true,
         dir: "./lib",
         // preserveModulesRoot: "src",

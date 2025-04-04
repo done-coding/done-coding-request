@@ -18,8 +18,8 @@ import type {
   AxiosRequestConfig,
   AxiosStatic,
 } from "axios";
-import _omit from "lodash/omit";
-import _get from "lodash/get";
+import _omit from "lodash.omit";
+import _get from "lodash.get";
 export * from "@done-coding/request-base";
 
 export const createRequest = <S>({

@@ -1,4 +1,4 @@
-import _assign from "lodash/assign";
+import _assign from "lodash.assign";
 
 import type { RequestFailResult } from "./error";
 import {

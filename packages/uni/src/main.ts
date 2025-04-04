@@ -12,8 +12,8 @@ import {
 } from "@done-coding/request-base";
 
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import _omit from "lodash/omit";
-import _get from "lodash/get";
+import _omit from "lodash.omit";
+import _get from "lodash.get";
 
 export * from "@done-coding/request-base";
 

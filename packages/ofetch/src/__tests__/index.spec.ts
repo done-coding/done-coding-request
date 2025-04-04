@@ -3,7 +3,7 @@ import { describe, test, expect, beforeAll, vi } from "vitest";
 import { getRequest, SceneUrlEnum } from "./request";
 
 import { InnerErrorCode } from "@/index";
-import _omit from "lodash/omit";
+import _omit from "lodash.omit";
 import {
   createServer,
   basePath,
