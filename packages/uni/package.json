@@ -21,8 +21,9 @@
     "types"
   ],
   "scripts": {
+    "serve": "echo 'uni 不支持serve'",
     "clean": "rimraf es lib types",
-    "dev": "vite",
+    "dev": "vite build --watch",
     "predev": "pnpm run clean",
     "build": "vite build",
     "prebuild": "pnpm run clean",

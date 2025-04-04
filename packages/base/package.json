@@ -21,8 +21,9 @@
     "types"
   ],
   "scripts": {
+    "serve": "vite",
     "clean": "rimraf es lib types",
-    "dev": "vite",
+    "dev": "vite build --watch",
     "predev": "pnpm run clean",
     "build": "vite build",
     "prebuild": "pnpm run clean",
