@@ -18,6 +18,10 @@ export enum InnerErrorCode {
   NO_BUSINESS_CODE = "NO_BUSINESS_CODE",
   /** 无网络错误码 */
   NO_NETWORK_CODE = "NO_NETWORK_CODE",
+  /**
+   * 请求被中止
+   */
+  ABORT = "ABORT",
 }
 
 interface ErrorOptions {

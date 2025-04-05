@@ -12,6 +12,7 @@ export const resolveErrorMsg = (error: any) => {
   if (error instanceof Error) {
     return error.message;
   }
+  return "未知错误";
 };
 
 /** 分发业务结果 */
