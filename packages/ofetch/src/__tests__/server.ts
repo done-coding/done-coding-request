@@ -33,6 +33,7 @@ export const createServer = () => {
         getUrl(SceneUrlEnum.FAIL_NETWORK_CODE_404),
         () => {
           return new HttpResponse(
+            /**  @ts-ignore */
             {},
             {
               status: 404,
