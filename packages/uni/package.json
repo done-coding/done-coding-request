@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-uni",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "请求uni配置",
   "main": "lib/index.cjs",
   "module": "es/index.mjs",

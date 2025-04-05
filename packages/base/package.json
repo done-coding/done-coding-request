@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-base",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "请求基本配置",
   "main": "lib/index.cjs",
   "module": "es/index.mjs",
