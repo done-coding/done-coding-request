@@ -105,7 +105,7 @@ export const createRequest = <S>({
         .then((res) => {
           const { statusCode: code } = res;
           if (isSuccessNetworkCode(code)) {
-            return dispatchBusinessResult(res, otherOpt);
+            return dispatchBusinessResult(res, otherOpt, debug);
           } else {
             const { errMsg = `${code}` } = res;
             throw new RequestFailResultNetwork({
