@@ -12,9 +12,6 @@
       "types": "./types/index.d.ts"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "lib",
     "es",
@@ -35,6 +32,10 @@
     "type": "git",
     "url": "git@gitee.com:justsosu/done-coding-request.git",
     "directory": "packages/base"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "author": "JustSoSu",
   "license": "MIT",
