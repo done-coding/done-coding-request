@@ -9,112 +9,15 @@ import {
 } from "./error";
 import { DebugLevelEnum, createDebugInfo, DebugStageEnum } from "./debug";
 import { resolveErrorMsg } from "./utils";
-
-/** 请求结果 */
-export interface RequestResult<D> {
-  code: number;
-  data: D;
-  message: string;
-}
-
-/**
- * 请求ui配置
- */
-export interface RequestUiConfig {
-  /**
-   * 错误提示
-   */
-  errorToast?: boolean;
-}
-
-/** 拓展配置 */
-export interface ExtendConfig {
-  /** 请求ui配置 */
-  uiConfig?: RequestUiConfig;
-}
-
-export type ApiConfigBase = Record<string, any>;
-
-/** api配置选项 */
-export type ApiConfig<C extends ApiConfigBase> = C & ExtendConfig;
-
-/** 发起请求选项 */
-export type IssueConfig<C extends ApiConfigBase> = C & {
-  BASE_PATH: string;
-  TIMEOUT: number;
-  /** 开启调试 */
-  DEBUG?: boolean;
-};
-
-/** 业务配置项 */
-export interface BusinessOptions<R> {
-  /** 获取业务状态码 */
-  getBusinessCode: (res: R) => number;
-  /** 获取业务信息 */
-  getBusinessMsg: (res: R) => string;
-  /** 获取业务数据 */
-  getBusinessData: <D = unknown>(res: R) => D;
-  /** 业务成功状态码列表 */
-  businessSuccessCodeList?: number[];
-  /**
-   * 是否是成功的业务码
-   * 优先级高于businessSuccessCodeList
-   */
-  isSuccessBusinessCode?: (code: number) => boolean;
-}
-
-/**
- * 处理错误结果重新请求
- */
-export interface BeforeErrorResultReload {
-  reload: true;
-}
-
-/** 处理错误结果不重新请求 */
-export interface BeforeErrorResultNotReload {
-  /** 可以展示错误提示 */
-  canShowErrorToast?: boolean;
-  reload?: false;
-  /** 新的错误 */
-  newError: RequestFailResult;
-}
-
-/** 处理错误结果 */
-export type BeforeErrorResult =
-  | BeforeErrorResultReload
-  | BeforeErrorResultNotReload;
-
-/** request 选项 */
-export interface Options<C extends ApiConfigBase, R>
-  extends BusinessOptions<R>,
-    ExtendConfig {
-  /** 根路径 */
-  basePath: string;
-  /** 超时时间 */
-  timeout: number;
-  /** 发起请求的方法 */
-  issue: <D>(
-    config: IssueConfig<C>,
-    extendConfig: ExtendConfig,
-  ) => Promise<RequestResult<D>>;
-  /** 处理错误 */
-  beforeError?: (
-    currentError: RequestFailResult,
-    options: {
-      extendConfig: ExtendConfig;
-      apiConfig: ApiConfig<C>;
-    },
-  ) => BeforeErrorResult | Promise<BeforeErrorResult>;
-  /** 展示提示 */
-  showToast?: (message: string) => void;
-  /** 成功的网络状态码 */
-  networkSuccessCodeList?: number[];
-  /**
-   * 是否是成功的网络状态码
-   * 优先级高于networkSuccessCodeList
-   */
-  isSuccessNetworkCode?: (code: number) => boolean;
-}
+import type {
+  ApiConfig,
+  ApiConfigBase,
+  BeforeErrorResult,
+  ExtendConfig,
+  IssueConfig,
+  Options,
+  RequestResult,
+} from "./types";
 
 /** dealError错误捕捉 */
 // !!!所有外部传入的function都需要try catch
@@ -164,6 +67,10 @@ export class Request<C extends ApiConfigBase, R> {
     return this.options.uiConfig || {};
   }
 
+  private get cacheConfig() {
+    return this.options.cacheConfig || {};
+  }
+
   private get issue() {
     return this.options.issue;
   }
@@ -191,12 +98,15 @@ export class Request<C extends ApiConfigBase, R> {
         data: apiConfig,
       });
 
-    const { uiConfig = {}, ...otherXApiConfig } = apiConfig;
+    const { uiConfig = {}, cacheConfig = {}, ...otherXApiConfig } = apiConfig;
 
     const uiConfigFinal = _assign({}, this.uiConfig, uiConfig);
 
+    const cacheConfigFinal = _assign({}, this.cacheConfig, cacheConfig);
+
     const extendConfig: ExtendConfig = {
       uiConfig: uiConfigFinal,
+      cacheConfig: cacheConfigFinal,
     };
 
     const config: IssueConfig<C> = {
@@ -231,7 +141,7 @@ export class Request<C extends ApiConfigBase, R> {
           createDebugInfo({
             stage: DebugStageEnum.DEAL_ERROR_RESULT_RELOAD,
           });
-        return this.request(apiConfig);
+        return this.request(apiConfig, debug);
       } else {
         const { newError, canShowErrorToast = true } = beforeErrorRes;
         if (canShowErrorToast && (uiConfigFinal.errorToast ?? true)) {

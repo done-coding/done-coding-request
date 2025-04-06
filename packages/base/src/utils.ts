@@ -4,7 +4,7 @@ import {
   RequestFailResultBusiness,
   RequestFailResultNetwork,
 } from "./error";
-import type { BusinessOptions, RequestResult } from "./main";
+import type { BusinessOptions, RequestResult } from "./types";
 import { createDebugInfo, DebugLevelEnum, DebugStageEnum } from "./debug";
 
 /** 获取错误信息 */
