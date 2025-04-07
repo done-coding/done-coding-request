@@ -18,6 +18,7 @@ import type {
   Options,
   RequestResult,
 } from "./types";
+import { getCacheRunTimeCxt } from "./cache";
 
 /** dealError错误捕捉 */
 // !!!所有外部传入的function都需要try catch
@@ -71,6 +72,11 @@ export class Request<C extends ApiConfigBase, R> {
     return this.options.cacheConfig || {};
   }
 
+  /** 缓存相关方法 */
+  private get cacheFn() {
+    return this.options.cache;
+  }
+
   private get issue() {
     return this.options.issue;
   }
@@ -104,6 +110,17 @@ export class Request<C extends ApiConfigBase, R> {
 
     const cacheConfigFinal = _assign({}, this.cacheConfig, cacheConfig);
 
+    const { cacheResult, setCache } = await getCacheRunTimeCxt<D>({
+      cacheOptions: this.cacheFn,
+      cacheConfig: cacheConfigFinal,
+      apiConfig: apiConfig,
+    });
+
+    /** 有缓存 直接返回 */
+    if (cacheResult) {
+      return cacheResult;
+    }
+
     const extendConfig: ExtendConfig = {
       uiConfig: uiConfigFinal,
       cacheConfig: cacheConfigFinal,
@@ -118,6 +135,8 @@ export class Request<C extends ApiConfigBase, R> {
 
     try {
       const res = await this.issue<D>(config, extendConfig);
+      // 设置缓存
+      setCache?.(res);
       return res;
     } catch (error) {
       const beforeErrorRes = await catchBeforeError(() => {

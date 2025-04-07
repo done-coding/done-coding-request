@@ -15,8 +15,8 @@ export const resolveErrorMsg = (error: any) => {
   return "未知错误";
 };
 
-/** 分发业务结果 */
-export const dispatchBusinessResult = <R, D = any>(
+/** 分发业务结果-基础 */
+export const dispatchBusinessResultBase = async <R, D = any>(
   res: R,
   {
     getBusinessCode,
@@ -26,7 +26,7 @@ export const dispatchBusinessResult = <R, D = any>(
     isSuccessBusinessCode,
   }: BusinessOptions<R>,
   debug?: boolean,
-): RequestResult<D> | Promise<RequestResult<D>> => {
+): Promise<RequestResult<D>> => {
   debug &&
     createDebugInfo(
       { stage: DebugStageEnum.NETWORK_SUCCESS, data: res },
@@ -90,6 +90,40 @@ export const dispatchBusinessResult = <R, D = any>(
     });
     return Promise.reject(errorInfo);
   }
+};
+
+export type DispatchBusinessResult = typeof dispatchBusinessResultBase;
+
+/** 确保同步函数不报错 */
+export const ensureSyncFnNotError = <F extends (...args: any[]) => any>(
+  fn: F,
+  errorDefaultValue: ReturnType<F>,
+): F => {
+  const newFn = (...args: Parameters<F>) => {
+    try {
+      return fn(...args);
+    } catch (error) {
+      console.error(fn.name, error, fn);
+      return errorDefaultValue;
+    }
+  };
+  return newFn as F;
+};
+
+/** 确保异步函数不报错 */
+export const ensureAsyncFnNotError = <
+  F extends (...args: any[]) => Promise<any>,
+>(
+  fn: F,
+  errorDefaultValue: ReturnType<F>,
+): F => {
+  const newFn = (...args: Parameters<F>) => {
+    return fn(...args).catch((error) => {
+      console.error(fn.name, error, fn);
+      return errorDefaultValue;
+    });
+  };
+  return newFn as F;
 };
 
 /** 回调请求转Promise */

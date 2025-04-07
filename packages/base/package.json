@@ -43,6 +43,7 @@
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
     "@types/lodash.assign": "^4.2.9",
+    "@types/lodash.curry": "^4.1.9",
     "@types/lodash.omit": "^4.5.9",
     "@types/qs": "^6.9.9",
     "@vitest/coverage-istanbul": "^1.1.1",
@@ -57,6 +58,7 @@
   },
   "dependencies": {
     "lodash.assign": "^4.2.0",
+    "lodash.curry": "^4.1.1",
     "lodash.omit": "^4.5.0"
   },
   "sideEffects": [],

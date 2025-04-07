@@ -67,16 +67,22 @@ export interface UiOptions {
   showToast?: (message: string) => void;
 }
 
-/** 缓存配置项 */
-export interface CacheOptions<C extends ApiConfigBase> {
+/** 缓存选项 */
+export interface CacheOptions {
+  /** 获取缓存key */
+  getKey: <C extends ApiConfigBase>(apiConfig: ApiConfig<C>) => string;
   /**
    * 设置缓存
    * --
    * 业务成功才会调用
    */
-  setCache?: (apiConfig: ApiConfig<C>) => Promise<void>;
+  setCache: <D>(
+    key: string,
+    data: RequestResult<D>,
+    config: RequestCacheConfig,
+  ) => Promise<void>;
   /** 获取缓存 */
-  getCache?: (apiConfig: ApiConfig<C>) => Promise<any>;
+  getCache: <D>(key: string) => Promise<RequestResult<D> | undefined>;
 }
 
 /**
@@ -104,7 +110,6 @@ export type BeforeErrorResult =
 export interface Options<C extends ApiConfigBase, R>
   extends BusinessOptions<R>,
     ExtendConfig,
-    CacheOptions<C>,
     UiOptions {
   /** 根路径 */
   basePath: string;
@@ -130,4 +135,6 @@ export interface Options<C extends ApiConfigBase, R>
    * 优先级高于networkSuccessCodeList
    */
   isSuccessNetworkCode?: (code: number) => boolean;
+  /** 缓存选项配置 */
+  cache?: CacheOptions;
 }
