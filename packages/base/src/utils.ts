@@ -15,8 +15,8 @@ export const resolveErrorMsg = (error: any) => {
   return "未知错误";
 };
 
-/** 分发业务结果-基础 */
-export const dispatchBusinessResultBase = async <R, D = any>(
+/** 分发业务结果 */
+export const dispatchBusinessResult = async <R, D = any>(
   res: R,
   {
     getBusinessCode,
@@ -92,7 +92,7 @@ export const dispatchBusinessResultBase = async <R, D = any>(
   }
 };
 
-export type DispatchBusinessResult = typeof dispatchBusinessResultBase;
+export type DispatchBusinessResult = typeof dispatchBusinessResult;
 
 /** 确保同步函数不报错 */
 export const ensureSyncFnNotError = <F extends (...args: any[]) => any>(
