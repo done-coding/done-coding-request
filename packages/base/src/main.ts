@@ -136,7 +136,7 @@ export class Request<C extends ApiConfigBase, R> {
     try {
       const res = await this.issue<D>(config, extendConfig);
       // 设置缓存
-      setCache?.(res);
+      setCache?.(res, cacheConfigFinal);
       return res;
     } catch (error) {
       const beforeErrorRes = await catchBeforeError(() => {

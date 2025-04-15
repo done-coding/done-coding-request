@@ -2,6 +2,7 @@ import type {
   ApiConfig,
   ApiConfigBase,
   CacheOptions,
+  CacheSetNoKey,
   RequestCacheConfig,
   RequestResult,
 } from "./types";
@@ -36,7 +37,7 @@ export const getCacheRunTimeCxt = async <
       )(cacheKey)
     : undefined;
 
-  const setCache = cacheEnabled
+  const setCache: CacheSetNoKey<D> | undefined = cacheEnabled
     ? ensureAsyncFnNotError(
         _curry(cacheOptions.setCache<D>)(cacheKey),
         Promise.resolve(),

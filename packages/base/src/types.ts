@@ -1,8 +1,11 @@
 import type { RequestFailResult } from "./error";
 
+/** 请求状态码类型 */
+export type RequestCodeType = number | string;
+
 /** 请求结果 */
 export interface RequestResult<D> {
-  code: number;
+  code: RequestCodeType;
   data: D;
   message: string;
 }
@@ -47,18 +50,18 @@ export type IssueConfig<C extends ApiConfigBase> = C & {
 /** 业务配置项 */
 export interface BusinessOptions<R> {
   /** 获取业务状态码 */
-  getBusinessCode: (res: R) => number;
+  getBusinessCode: (res: R) => RequestCodeType;
   /** 获取业务信息 */
   getBusinessMsg: (res: R) => string;
   /** 获取业务数据 */
   getBusinessData: <D = unknown>(res: R) => D;
   /** 业务成功状态码列表 */
-  businessSuccessCodeList?: number[];
+  businessSuccessCodeList?: RequestCodeType[];
   /**
    * 是否是成功的业务码
    * 优先级高于businessSuccessCodeList
    */
-  isSuccessBusinessCode?: (code: number) => boolean;
+  isSuccessBusinessCode?: (code: RequestCodeType) => boolean;
 }
 
 /** ui配置项 */
@@ -66,6 +69,12 @@ export interface UiOptions {
   /** 展示提示 */
   showToast?: (message: string) => void;
 }
+
+/** 缓存设置函数-无key */
+export type CacheSetNoKey<D> = (
+  data: RequestResult<D>,
+  config: RequestCacheConfig,
+) => Promise<void>;
 
 /** 缓存选项 */
 export interface CacheOptions {
@@ -78,9 +87,8 @@ export interface CacheOptions {
    */
   setCache: <D>(
     key: string,
-    data: RequestResult<D>,
-    config: RequestCacheConfig,
-  ) => Promise<void>;
+    ...args: Parameters<CacheSetNoKey<D>>
+  ) => ReturnType<CacheSetNoKey<D>>;
   /** 获取缓存 */
   getCache: <D>(key: string) => Promise<RequestResult<D> | undefined>;
 }

@@ -1,3 +1,5 @@
+import type { RequestCodeType } from "./types";
+
 /**
  * 内部错误码
  */
@@ -25,7 +27,7 @@ export enum InnerErrorCode {
 }
 
 interface ErrorOptions {
-  code: number | InnerErrorCode;
+  code: RequestCodeType | InnerErrorCode;
   message: string;
   isBusinessError: boolean;
 }
