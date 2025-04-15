@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-ofetch",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "请求ofetch配置 支持nuxt",
   "main": "lib/index.cjs",
   "module": "es/index.mjs",
