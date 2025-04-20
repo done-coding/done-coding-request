@@ -12,7 +12,7 @@ import {
   showToast,
   failReloadFn,
 } from "./server";
-import uniEnv from "uni-test-env";
+import * as uniEnv from "@done-testing/mock-uni-env";
 
 let server: ReturnType<typeof createServer>;
 
