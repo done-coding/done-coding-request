@@ -54,7 +54,7 @@ importers:
   packages/axios:
     dependencies:
       '@done-coding/request-base':
-        specifier: 'workspace:'
+        specifier: workspace:^
         version: link:../base
       lodash.get:
         specifier: ^4.4.2
@@ -167,7 +167,7 @@ importers:
   packages/ofetch:
     dependencies:
       '@done-coding/request-base':
-        specifier: 'workspace:'
+        specifier: workspace:^
         version: link:../base
       lodash.get:
         specifier: ^4.4.2
@@ -225,7 +225,7 @@ importers:
   packages/uni:
     dependencies:
       '@done-coding/request-base':
-        specifier: 'workspace:'
+        specifier: workspace:^
         version: link:../base
       lodash.get:
         specifier: ^4.4.2
