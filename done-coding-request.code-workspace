@@ -5,19 +5,19 @@
       "path": "."
     },
     {
-      "name": "@done-coding/request-base",
+      "name": "base",
       "path": "packages/base"
     },
     {
-      "name": "@done-coding/request-uni",
+      "name": "uni",
       "path": "packages/uni"
     },
     {
-      "name": "@done-coding/request-axios",
+      "name": "axios",
       "path": "packages/axios"
     },
     {
-      "name": "@done-coding/request-ofetch",
+      "name": "ofetch",
       "path": "packages/ofetch"
     }
   ],
@@ -46,10 +46,6 @@
     "[xml]": {
       "editor.defaultFormatter": "redhat.vscode-xml"
     },
-    "i18n-ally.sourceLanguage": "zh-CN",
-    "i18n-ally.displayLanguage": "zh-CN",
-    "i18n-ally.localesPaths": ["packages/components-common/src/locales"],
-    "i18n-ally.keystyle": "nested",
     "[shellscript]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
     },
