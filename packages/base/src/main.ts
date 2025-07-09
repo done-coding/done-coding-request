@@ -97,7 +97,7 @@ export class Request<C extends ApiConfigBase, R> {
     apiConfig: ApiConfig<C>,
     /** 开启调试 */
     debug = false,
-  ): Promise<RequestResult<D>> => {
+  ): Promise<RequestResult<D, R>> => {
     debug &&
       createDebugInfo({
         stage: DebugStageEnum.BEFORE,
@@ -110,7 +110,11 @@ export class Request<C extends ApiConfigBase, R> {
 
     const cacheConfigFinal = _assign({}, this.cacheConfig, cacheConfig);
 
-    const { cacheResult, setCache } = await getCacheRunTimeCxt<D>({
+    const { cacheResult, setCache } = await getCacheRunTimeCxt<
+      D,
+      R,
+      ApiConfig<C>
+    >({
       cacheOptions: this.cacheFn,
       cacheConfig: cacheConfigFinal,
       apiConfig: apiConfig,

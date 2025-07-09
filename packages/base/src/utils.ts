@@ -26,7 +26,7 @@ export const dispatchBusinessResult = async <R, D = any>(
     isSuccessBusinessCode,
   }: BusinessOptions<R>,
   debug?: boolean,
-): Promise<RequestResult<D>> => {
+): Promise<RequestResult<D, R>> => {
   debug &&
     createDebugInfo(
       { stage: DebugStageEnum.NETWORK_SUCCESS, data: res },
@@ -41,10 +41,11 @@ export const dispatchBusinessResult = async <R, D = any>(
         ? isSuccessBusinessCode(code)
         : businessSuccessCodeList.includes(code)
     ) {
-      const info: RequestResult<D> = {
+      const info: RequestResult<D, R> = {
         code,
         data: getBusinessData(res),
         message,
+        _raw: res,
       };
       debug &&
         createDebugInfo(

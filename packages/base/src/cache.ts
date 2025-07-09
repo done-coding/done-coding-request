@@ -10,10 +10,7 @@ import { ensureAsyncFnNotError, ensureSyncFnNotError } from "./utils";
 import _curry from "lodash.curry";
 
 /** 获取缓存运行时上下文 */
-export const getCacheRunTimeCxt = async <
-  D = any,
-  C extends ApiConfigBase = ApiConfigBase,
->({
+export const getCacheRunTimeCxt = async <D, R, C extends ApiConfigBase>({
   cacheOptions,
   cacheConfig,
   apiConfig,
@@ -30,16 +27,16 @@ export const getCacheRunTimeCxt = async <
     cacheKey = ensureSyncFnNotError(cacheOptions.getKey, "")(apiConfig);
   }
 
-  const cacheResult: RequestResult<D> | undefined = cacheEnabled
+  const cacheResult: RequestResult<D, R> | undefined = cacheEnabled
     ? await ensureAsyncFnNotError(
-        cacheOptions.getCache<D>,
+        cacheOptions.getCache<D, R>,
         Promise.resolve(undefined),
       )(cacheKey)
     : undefined;
 
-  const setCache: CacheSetNoKey<D> | undefined = cacheEnabled
+  const setCache: CacheSetNoKey<D, R> | undefined = cacheEnabled
     ? ensureAsyncFnNotError(
-        _curry(cacheOptions.setCache<D>)(cacheKey),
+        _curry(cacheOptions.setCache<D, R>)(cacheKey),
         Promise.resolve(),
       )
     : undefined;

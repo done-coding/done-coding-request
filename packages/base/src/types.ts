@@ -4,10 +4,25 @@ import type { RequestFailResult } from "./error";
 export type RequestCodeType = number | string;
 
 /** 请求结果 */
-export interface RequestResult<D> {
+export interface RequestResult<D, R> {
+  /** 业务状态码 */
   code: RequestCodeType;
+  /** 数据主体 */
   data: D;
+  /** 业务提示信息 */
   message: string;
+  /**
+   * 接口返回的原始业务层数据
+   * ---
+   * ---
+   * ---
+   * 留口子提供原始数据原因及建议如下:
+   * ---
+   * - 考虑会存在情况: 有的接口存在在业务码这一层级还返回其他的 如分页信息 而不是全部放到data里
+   * - 若非必须要 建议不要访问
+   * - 如果访问建议只访问非data的其他属性
+   */
+  _raw: R;
 }
 
 /**
@@ -71,8 +86,8 @@ export interface UiOptions {
 }
 
 /** 缓存设置函数-无key */
-export type CacheSetNoKey<D> = (
-  data: RequestResult<D>,
+export type CacheSetNoKey<D, R> = (
+  data: RequestResult<D, R>,
   config: RequestCacheConfig,
 ) => Promise<void>;
 
@@ -85,12 +100,12 @@ export interface CacheOptions {
    * --
    * 业务成功才会调用
    */
-  setCache: <D>(
+  setCache: <D, R>(
     key: string,
-    ...args: Parameters<CacheSetNoKey<D>>
-  ) => ReturnType<CacheSetNoKey<D>>;
+    ...args: Parameters<CacheSetNoKey<D, R>>
+  ) => ReturnType<CacheSetNoKey<D, R>>;
   /** 获取缓存 */
-  getCache: <D>(key: string) => Promise<RequestResult<D> | undefined>;
+  getCache: <D, R>(key: string) => Promise<RequestResult<D, R> | undefined>;
 }
 
 /**
@@ -127,7 +142,7 @@ export interface Options<C extends ApiConfigBase, R>
   issue: <D>(
     config: IssueConfig<C>,
     extendConfig: ExtendConfig,
-  ) => Promise<RequestResult<D>>;
+  ) => Promise<RequestResult<D, R>>;
   /** 处理错误 */
   beforeError?: (
     currentError: RequestFailResult,
