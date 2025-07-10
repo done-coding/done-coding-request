@@ -38,7 +38,7 @@ export const dispatchBusinessResult = async <R, D = any>(
     const message = getBusinessMsg(res);
     if (
       isSuccessBusinessCode
-        ? isSuccessBusinessCode(code)
+        ? isSuccessBusinessCode(code, res)
         : businessSuccessCodeList.includes(code)
     ) {
       const info: RequestResult<D, R> = {

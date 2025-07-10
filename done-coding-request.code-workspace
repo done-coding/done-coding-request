@@ -62,6 +62,9 @@
     ],
     "[ignore]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
     }
   },
   "extensions": {

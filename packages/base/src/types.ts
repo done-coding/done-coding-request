@@ -76,7 +76,7 @@ export interface BusinessOptions<R> {
    * 是否是成功的业务码
    * 优先级高于businessSuccessCodeList
    */
-  isSuccessBusinessCode?: (code: RequestCodeType) => boolean;
+  isSuccessBusinessCode?: (code: RequestCodeType, res: R) => boolean;
 }
 
 /** ui配置项 */

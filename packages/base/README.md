@@ -13,6 +13,7 @@
 这些细化包已经基于本包进行了完整的封装，提供了更好的类型支持和更简单的使用方式。直接使用本包需要自行处理很多细节，建议使用对应的场景化包。
 
 **如果以上场景化包不再满足需求**，可以使用本包进行自定义封装，例如：
+
 - 需要支持其他请求库（如 fetch、XMLHttpRequest 等）
 - 需要特殊的请求处理逻辑
 - 需要自定义的响应处理方式
@@ -51,6 +52,7 @@
 - 可预测的请求结果
 
 可用的实现：
+
 - [@done-coding/request-axios](./../axios/README.md) - 基于 axios 的请求拦截器实现
 - [@done-coding/request-ofetch](./../ofetch/README.md) - 基于 ofetch 的请求拦截器实现
 - [@done-coding/request-uni](./../uni/README.md) - 基于 uni-app 的请求拦截器实现
@@ -104,12 +106,14 @@ const request = createRequest({
       code: number | string,  // 业务状态码
       data: D,               // 业务数据（泛型类型）
       message: string        // 业务消息
+      _raw: any,             // 原始响应数据（1.2.2 考虑会存在情况: 有的接口存在在业务码这一层级还返回其他的 如分页信息 而不是全部放到data里 如果访问建议只访问非data的其他属性）
     };
   }
 });
 ```
 
 issue 函数的特点：
+
 1. **必选配置**：必须提供此配置才能创建请求实例
 2. **统一响应格式**：必须返回统一格式的响应对象（RequestResult<D>）
 3. **完整配置信息**：可以访问所有请求相关的配置
@@ -118,6 +122,7 @@ issue 函数的特点：
 6. **类型安全**：支持泛型类型，可以指定返回数据的类型
 
 issue 函数的错误处理：
+
 - 如果请求过程中发生错误，会被自动转换为 RequestFailResult 类型
 - 网络错误会被转换为 RequestFailResultNetwork
 - 业务错误会被转换为 RequestFailResultBusiness
@@ -129,10 +134,10 @@ issue 函数的错误处理：
 
 ```typescript
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json'
+    "Content-Type": "application/json",
   },
   // 其他全局配置...
 });
@@ -144,12 +149,12 @@ const request = createRequest({
 
 ```typescript
 const response = await request({
-  url: '/api/data',
-  method: 'GET',
+  url: "/api/data",
+  method: "GET",
   timeout: 3000, // 覆盖全局配置
   headers: {
-    'Authorization': 'Bearer token' // 合并到全局配置
-  }
+    Authorization: "Bearer token", // 合并到全局配置
+  },
 });
 ```
 
@@ -180,7 +185,7 @@ const response = await request({
 
 ```typescript
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   cacheConfig: {
     // 生成缓存键
     getKey: (config) => `${config.url}-${JSON.stringify(config.params)}`,
@@ -193,10 +198,10 @@ const request = createRequest({
     getCache: async (key) => {
       // 实现缓存获取逻辑
       return undefined;
-    }
+    },
   },
   // 默认启用缓存
-  useCache: true
+  useCache: true,
 });
 ```
 
@@ -204,25 +209,25 @@ const request = createRequest({
 
 ```typescript
 const response = await request({
-  url: '/api/data',
-  method: 'GET',
+  url: "/api/data",
+  method: "GET",
   // 覆盖全局缓存配置
   cacheConfig: {
-    useCache: false // 禁用当前请求的缓存
-  }
+    useCache: false, // 禁用当前请求的缓存
+  },
 });
 ```
 
 ### 缓存配置
 
 ```typescript
-import { createRequest } from '@done-coding/request-base';
+import { createRequest } from "@done-coding/request-base";
 
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   // 缓存配置
   cacheConfig: {
-    useCache: true
+    useCache: true,
   },
   // 缓存选项配置
   cache: {
@@ -233,23 +238,24 @@ const request = createRequest({
     getCache: async (key) => {
       // 实现缓存获取逻辑
       return undefined;
-    }
-  }
+    },
+  },
 });
 
 // 使用缓存
 const response = await request({
-  url: '/api/data',
-  method: 'GET',
+  url: "/api/data",
+  method: "GET",
   cacheConfig: {
-    useCache: true
-  }
+    useCache: true,
+  },
 });
 ```
 
 ### 缓存策略说明
 
 1. **缓存配置**：
+
    - `cacheConfig`: 控制是否使用缓存
      - `useCache`: 是否启用缓存
    - `cache`: 缓存的具体实现
@@ -258,16 +264,19 @@ const response = await request({
      - `getCache`: 获取缓存
 
 2. **缓存键生成**：
+
    - 通过 `cache.getKey` 函数生成缓存键
    - 默认使用 URL 和参数组合生成
    - 支持自定义生成策略
 
 3. **缓存存储**：
+
    - 通过 `cache.setCache` 函数存储缓存
    - 只有在业务成功时才会调用
    - 支持异步存储操作
 
 4. **缓存获取**：
+
    - 通过 `cache.getCache` 函数获取缓存
    - 支持异步获取操作
    - 返回 undefined 表示无缓存
@@ -308,51 +317,51 @@ function createRequest(options: Options): RequestFunction;
 ### 基础配置
 
 ```typescript
-import { createRequest } from '@done-coding/request-base';
+import { createRequest } from "@done-coding/request-base";
 
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   timeout: 5000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 // 发起请求
 const response = await request({
-  url: '/api/data',
-  method: 'GET',
-  params: { id: 1 }
+  url: "/api/data",
+  method: "GET",
+  params: { id: 1 },
 });
 ```
 
 ### 错误处理
 
 ```typescript
-import { createRequest } from '@done-coding/request-base';
+import { createRequest } from "@done-coding/request-base";
 
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   beforeError: (error) => {
     if (error.isBusinessError) {
       // 处理业务错误
       return {
         newError: error,
-        canShowErrorToast: true
+        canShowErrorToast: true,
       };
     }
     // 处理网络错误
     return {
       newError: error,
-      canShowErrorToast: true
+      canShowErrorToast: true,
     };
-  }
+  },
 });
 
 try {
   const response = await request({
-    url: '/api/data',
-    method: 'GET'
+    url: "/api/data",
+    method: "GET",
   });
 } catch (error) {
   // 错误已经被 beforeError 处理
@@ -363,13 +372,13 @@ try {
 ### 缓存配置
 
 ```typescript
-import { createRequest } from '@done-coding/request-base';
+import { createRequest } from "@done-coding/request-base";
 
 const request = createRequest({
-  basePath: 'https://api.example.com',
+  basePath: "https://api.example.com",
   // 缓存配置
   cacheConfig: {
-    useCache: true
+    useCache: true,
   },
   // 缓存选项配置
   cache: {
@@ -380,17 +389,17 @@ const request = createRequest({
     getCache: async (key) => {
       // 实现缓存获取逻辑
       return undefined;
-    }
-  }
+    },
+  },
 });
 
 // 使用缓存
 const response = await request({
-  url: '/api/data',
-  method: 'GET',
+  url: "/api/data",
+  method: "GET",
   cacheConfig: {
-    useCache: true
-  }
+    useCache: true,
+  },
 });
 ```
 
@@ -438,4 +447,4 @@ pnpm test
 
 ## 许可证
 
-MIT 
+MIT
