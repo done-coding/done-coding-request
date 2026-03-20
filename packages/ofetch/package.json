@@ -1,6 +1,6 @@
 {
   "name": "@done-coding/request-ofetch",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "请求ofetch配置 支持nuxt",
   "main": "lib/index.cjs",
   "module": "es/index.mjs",
@@ -59,7 +59,7 @@
   },
   "sideEffects": [],
   "dependencies": {
-    "@done-coding/request-base": "workspace:1.2.2",
+    "@done-coding/request-base": "workspace:1.2.3",
     "lodash.get": "^4.4.2",
     "lodash.omit": "^4.5.0"
   },
