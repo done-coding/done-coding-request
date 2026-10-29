@@ -93,7 +93,10 @@ export const createServer = () => {
     ])
     .flat();
 
-  const server = setupServer(...list);
+  const server = setupServer(
+    ...list,
+    http.all("*", () => HttpResponse.error()),
+  );
 
   server.listen({});
 

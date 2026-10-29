@@ -5,3 +5,9 @@ packages/*/types
 packages/*/release
 packages/*/dist
 packages/*/coverage
+.scratch/
+lerna-debug.log
+.DS_Store
+.playwright-mcp/
+test-results/
+.pnpm-store/

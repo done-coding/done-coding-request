@@ -152,7 +152,7 @@ beforeAll(() => {
         });
     });
 
-    test.skip("断网", async () => {
+    test("断网", async () => {
       vi.stubGlobal("navigator", { onLine: false });
       await expect
         .soft(

@@ -1,6 +1,7 @@
 import type { Options, RequestFailResult } from "@done-coding/request-base";
 import {
   dispatchBusinessResult,
+  createHttpError,
   InnerErrorCode,
   callback2Promise,
   RequestFailResultNetwork,
@@ -105,13 +106,27 @@ export const createRequest = <S>({
         .then((res) => {
           const { statusCode: code } = res;
           if (isSuccessNetworkCode(code)) {
-            return dispatchBusinessResult(res, otherOpt, debug);
+            return dispatchBusinessResult(
+              res,
+              {
+                ...otherOpt,
+                responseMetadata: {
+                  status: code,
+                  statusText: "",
+                  headers: res.header,
+                },
+              },
+              debug,
+            );
           } else {
+            // 标准解析没有 statusText；未开启时保留 1.2.3 的 errMsg 规则。
             const { errMsg = `${code}` } = res;
-            throw new RequestFailResultNetwork({
-              code,
-              message: errMsg,
+            throw createHttpError({
+              response: { status: code, statusText: "", body: res.data },
+              options: otherOpt,
+              toBusinessResponse: (body) => ({ ...res, data: body as S }),
               cause: res,
+              legacyMessage: errMsg,
             });
           }
         })
@@ -196,7 +211,11 @@ export const createRequest = <S>({
             errNo ||
             error ||
             InnerErrorCode.NO_NETWORK_CODE;
-          if (message.includes("timeout") || message.includes("time out")) {
+          if (
+            ["请求超时", "timeout", "time out"].some((text) =>
+              message.includes(text),
+            )
+          ) {
             message = "请求超时";
             code = InnerErrorCode.NO_RESPONSE_TIMEOUT;
           } else {
