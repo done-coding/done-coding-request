@@ -1,6 +1,7 @@
 import type { Options, RequestFailResult } from "@done-coding/request-base";
 import {
   dispatchBusinessResult,
+  createHttpError,
   InnerErrorCode,
   RequestFailResultBase,
   RequestFailResultNetwork,
@@ -75,7 +76,20 @@ export const createRequest = <S>({
         timeout: TIMEOUT,
         ..._omit(otherConfig, ["BASE_PATH"]),
       })
-        .then((res) => dispatchBusinessResult(res, otherOpt, debug))
+        .then((res) =>
+          dispatchBusinessResult(
+            res,
+            {
+              ...otherOpt,
+              responseMetadata: {
+                status: res.status,
+                statusText: res.statusText ?? "",
+                headers: res.headers,
+              },
+            },
+            debug,
+          ),
+        )
         .catch((err) => {
           if (err instanceof RequestFailResultBase) {
             debug &&
@@ -94,8 +108,21 @@ export const createRequest = <S>({
           let message: string;
           if (response) {
             // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-            code = response.status;
-            message = response.statusText;
+            return Promise.reject(
+              createHttpError({
+                response: {
+                  status: response.status,
+                  statusText: response.statusText ?? "",
+                  body: response.data,
+                },
+                options: otherOpt,
+                toBusinessResponse: (body) => ({
+                  ...response,
+                  data: body as S,
+                }),
+                cause: err,
+              }),
+            );
           } else if (request) {
             // 请求已经成功发起，但没有收到响应
             code = InnerErrorCode.NO_RESPONSE;

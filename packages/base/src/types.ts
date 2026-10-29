@@ -3,6 +3,13 @@ import type { RequestFailResult } from "./error";
 /** 请求状态码类型 */
 export type RequestCodeType = number | string;
 
+/** 成功响应的传输元信息；headers 保留各传输库的原始类型 */
+export interface ResponseMetadata {
+  status: number;
+  statusText: string;
+  headers: unknown;
+}
+
 /** 请求结果 */
 export interface RequestResult<D, R> {
   /** 业务状态码 */
@@ -23,6 +30,8 @@ export interface RequestResult<D, R> {
    * - 如果访问建议只访问非data的其他属性
    */
   _raw: R;
+  /** HTTP 状态和响应头（例如 Location），不改变 _raw 的既有形状 */
+  _response?: ResponseMetadata;
 }
 
 /**
@@ -62,6 +71,29 @@ export type IssueConfig<C extends ApiConfigBase> = C & {
   DEBUG?: boolean;
 };
 
+/** 传输适配器归一化的 HTTP 响应 */
+export interface ErrorResponse {
+  status: number;
+  statusText: string;
+  body: unknown;
+}
+
+/** 错误解析复用的业务取值方法，输入为响应包体 */
+export interface ErrorResponseGetters {
+  getBusinessCode: (body: unknown) => RequestCodeType;
+  getBusinessMsg: (body: unknown) => string;
+  getBusinessData: <D = unknown>(body: unknown) => D;
+}
+
+/** 从失败响应提取的业务错误；HTTP 状态由传输层保留 */
+export interface ResponseErrorInfo {
+  code?: RequestCodeType;
+  message?: string;
+  retryable?: boolean;
+  outcome?: "not_executed" | "unknown";
+  fields?: unknown[];
+}
+
 /** 业务配置项 */
 export interface BusinessOptions<R> {
   /** 获取业务状态码 */
@@ -70,6 +102,11 @@ export interface BusinessOptions<R> {
   getBusinessMsg: (res: R) => string;
   /** 获取业务数据 */
   getBusinessData: <D = unknown>(res: R) => D;
+  /** 非成功 HTTP 响应解析；默认关闭，传入导出的 getErrorFromResponse 即开启标准解析 */
+  getErrorFromResponse?: (
+    response: ErrorResponse,
+    getters: ErrorResponseGetters,
+  ) => ResponseErrorInfo | undefined;
   /** 业务成功状态码列表 */
   businessSuccessCodeList?: RequestCodeType[];
   /**

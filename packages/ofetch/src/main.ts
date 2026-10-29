@@ -1,6 +1,7 @@
 import type { Options, RequestFailResult } from "@done-coding/request-base";
 import {
   dispatchBusinessResult,
+  createHttpError,
   InnerErrorCode,
   RequestFailResultBase,
   RequestFailResultNetwork,
@@ -10,7 +11,7 @@ import {
   resolveErrorMsg,
 } from "@done-coding/request-base";
 import { createRequest as createRequestBase } from "@done-coding/request-base";
-import type { $Fetch } from "ofetch";
+import type { $Fetch, ResponseType } from "ofetch";
 import _omit from "lodash.omit";
 import _get from "lodash.get";
 import type { FetchOptions } from "./types";
@@ -96,8 +97,22 @@ export const createRequest = <S>({
       };
       /** 请求开始时间 */
       const requestTimeStart = Date.now();
-      return instance(url, requestOptions)
-        .then((res) => dispatchBusinessResult(res, otherOpt, debug))
+      return instance
+        .raw<S, ResponseType>(url, requestOptions)
+        .then((res) =>
+          dispatchBusinessResult(
+            res._data as S,
+            {
+              ...otherOpt,
+              responseMetadata: {
+                status: res.status,
+                statusText: res.statusText ?? "",
+                headers: res.headers,
+              },
+            },
+            debug,
+          ),
+        )
         .catch((err) => {
           if (err instanceof RequestFailResultBase) {
             debug &&
@@ -111,6 +126,20 @@ export const createRequest = <S>({
             return Promise.reject(err);
           }
           const { response, request } = err;
+          if (response) {
+            return Promise.reject(
+              createHttpError({
+                response: {
+                  status: response.status,
+                  statusText: response.statusText ?? "",
+                  body: response._data,
+                },
+                options: otherOpt,
+                toBusinessResponse: (body) => body as S,
+                cause: err,
+              }),
+            );
+          }
           let code: RequestFailResult["code"];
           let message: string;
           /** 请求结束时间 */
@@ -132,10 +161,6 @@ export const createRequest = <S>({
           } else if (_get(globalThis, "navigator.onLine") === false) {
             code = InnerErrorCode.NO_RESPONSE_OFFLINE;
             message = "网络未连接";
-          } else if (response) {
-            // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-            code = response.status;
-            message = response.statusText;
           } else if (request) {
             // 请求已经成功发起，但没有收到响应
             code = InnerErrorCode.NO_RESPONSE;

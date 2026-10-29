@@ -83,24 +83,19 @@ beforeAll(() => {
           });
       });
 
-      test("配置beforeRequest 请求发起前出错情况2[错误未RequestFailResultBase实例]", async () => {
-        // const msg = Date.now().toString(36);
-        await expect
-          .soft(
-            request({
-              url: "http://www.baidu.com",
-              method: "get",
-              params: {
-                // message: msg,
-                blob: new Blob([]),
-              },
-            }),
-          )
-          .rejects.toMatchObject({
-            code: InnerErrorCode.REQUEST_ERROR,
-            isBusinessError: false,
-            // message: msg,
-          });
+      test("异步 beforeRequest 抛错保留请求前错误分类", async () => {
+        const asyncBeforeRequest = getRequest({
+          ...requestConfig,
+          beforeRequest: async () => {
+            throw new Error("异步请求前错误");
+          },
+        });
+        await expect(
+          asyncBeforeRequest({ url: SceneUrlEnum.FAIL_BEFORE_REQUEST }),
+        ).rejects.toMatchObject({
+          code: InnerErrorCode.REQUEST_ERROR,
+          isBusinessError: false,
+        });
       });
 
       test(`不配置beforeRequest 不存在code=${InnerErrorCode.REQUEST_ERROR}`, async () => {
