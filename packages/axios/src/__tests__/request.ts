@@ -61,5 +61,6 @@ export const getRequest = ({
       errorToast: true,
     },
     axios,
+    instanceCreateConfig: { proxy: false },
   });
 };

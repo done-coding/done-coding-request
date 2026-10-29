@@ -1,2 +1,4 @@
 packages:
-  - 'packages/**'
+  - "packages/**"
+  # 排除 uni-app 等随应用 vendored 的第三方模块（自带 package.json，否则会被 ** 误收为工作区包）
+  - "!**/uni_modules/**"

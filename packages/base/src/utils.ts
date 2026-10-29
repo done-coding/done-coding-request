@@ -4,7 +4,7 @@ import {
   RequestFailResultBusiness,
   RequestFailResultNetwork,
 } from "./error";
-import type { BusinessOptions, RequestResult } from "./types";
+import type { BusinessOptions, RequestResult, ResponseMetadata } from "./types";
 import { createDebugInfo, DebugLevelEnum, DebugStageEnum } from "./debug";
 
 /** 获取错误信息 */
@@ -24,7 +24,8 @@ export const dispatchBusinessResult = async <R, D = any>(
     getBusinessData,
     businessSuccessCodeList = [200],
     isSuccessBusinessCode,
-  }: BusinessOptions<R>,
+    responseMetadata,
+  }: BusinessOptions<R> & { responseMetadata?: ResponseMetadata },
   debug?: boolean,
 ): Promise<RequestResult<D, R>> => {
   debug &&
@@ -46,6 +47,7 @@ export const dispatchBusinessResult = async <R, D = any>(
         data: getBusinessData(res),
         message,
         _raw: res,
+        ...(responseMetadata ? { _response: responseMetadata } : {}),
       };
       debug &&
         createDebugInfo(
@@ -64,6 +66,7 @@ export const dispatchBusinessResult = async <R, D = any>(
       const errorInfo: RequestFailResult = new RequestFailResultBusiness({
         code,
         message: message ?? "未知错误",
+        httpStatus: responseMetadata?.status,
       });
       debug &&
         createDebugInfo(

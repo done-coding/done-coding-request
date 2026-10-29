@@ -1,0 +1,6 @@
+# dc-harness 生成清单；格式与内容由 lists --check 校验。
+docs/governance/BACKLOG.md
+docs/governance/SCHEDULE.md
+docs/governance/ARCHIVE-DONE.md
+docs/governance/DROPPED.md
+docs/governance/ISSUE.md

@@ -26,7 +26,19 @@ export enum InnerErrorCode {
   ABORT = "ABORT",
 }
 
-interface ErrorOptions {
+/** 错误的可选上下文，beforeError 替换为普通对象时同样保留 */
+export interface RequestErrorContext {
+  httpStatus?: number;
+  retryable?: boolean;
+  outcome?: "not_executed" | "unknown";
+  fields?: unknown[];
+  /** network 无响应/传输失败；http 非成功 HTTP；business 成功 HTTP 的业务失败 */
+  kind?: "network" | "http" | "business";
+  requestId?: string;
+  cause?: unknown;
+}
+
+interface ErrorOptions extends RequestErrorContext {
   code: RequestCodeType | InnerErrorCode;
   message: string;
   isBusinessError: boolean;
@@ -43,12 +55,26 @@ export class RequestFailResultBase extends Error {
   /** 错误信息 */
   public message: string;
 
-  public constructor({ message, code, isBusinessError }: ErrorOptions) {
+  public httpStatus?: number;
+  public retryable?: boolean;
+  public outcome?: RequestErrorContext["outcome"];
+  public fields?: unknown[];
+  public kind?: RequestErrorContext["kind"];
+  public requestId?: string;
+  public cause?: unknown;
+
+  public constructor({
+    message,
+    code,
+    isBusinessError,
+    ...context
+  }: ErrorOptions) {
     super(message);
     this.message = message;
     this.code = code;
     this.isBusinessError = isBusinessError;
     this.name = "DC Request ERROR";
+    Object.assign(this, context);
   }
 }
 
@@ -58,20 +84,13 @@ export class RequestFailResultBase extends Error {
 export class RequestFailResultNetwork extends RequestFailResultBase {
   public cause: unknown;
 
-  /**
-   * @param cause 错误原因
-   */
-  public constructor({
-    message,
-    code,
-    cause,
-  }: Omit<ErrorOptions, "isBusinessError"> & {
-    /** 错误原因 */
-    cause?: unknown;
-  }) {
-    super({ message, code, isBusinessError: false });
-
-    this.cause = cause;
+  public constructor(options: Omit<ErrorOptions, "isBusinessError">) {
+    super({
+      ...options,
+      kind: options.kind ?? "network",
+      isBusinessError: false,
+    });
+    this.cause = options.cause;
   }
 }
 
@@ -79,8 +98,12 @@ export class RequestFailResultNetwork extends RequestFailResultBase {
  * 业务错误
  */
 export class RequestFailResultBusiness extends RequestFailResultBase {
-  public constructor({ message, code }: Omit<ErrorOptions, "isBusinessError">) {
-    super({ message, code, isBusinessError: true });
+  public constructor(options: Omit<ErrorOptions, "isBusinessError">) {
+    super({
+      ...options,
+      kind: options.kind ?? "business",
+      isBusinessError: true,
+    });
   }
 }
 

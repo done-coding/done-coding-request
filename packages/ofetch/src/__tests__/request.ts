@@ -1,5 +1,5 @@
 import { createRequest } from "@/main";
-import { ofetch } from "ofetch";
+import { createFetch } from "ofetch";
 
 export enum SceneUrlEnum {
   /** 请求前出错 */
@@ -45,14 +45,14 @@ export const getRequest = ({
     basePath,
     timeout,
     businessSuccessCodeList: [200],
-    getBusinessCode: ({ data }) => {
-      return data.code;
+    getBusinessCode: (body) => {
+      return body.code;
     },
-    getBusinessData: ({ data }) => {
-      return data.data;
+    getBusinessData: (body) => {
+      return body.data;
     },
-    getBusinessMsg: ({ data }) => {
-      return data.message;
+    getBusinessMsg: (body) => {
+      return body.message;
     },
     beforeRequest,
     beforeError,
@@ -60,6 +60,6 @@ export const getRequest = ({
     uiConfig: {
       errorToast: true,
     },
-    Fetch: ofetch,
+    Fetch: createFetch({ fetch: (...args) => globalThis.fetch(...args) }),
   });
 };
