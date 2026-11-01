@@ -45,6 +45,7 @@ jobs:
     # 必须显式声明权限，确保 GITHUB_TOKEN 有推送代码和标签的能力
     permissions:
       contents: write
+      id-token: write # npm OIDC 可信发布
 
     steps:
       # --------------------------------------------------------
@@ -72,6 +73,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org"
+
+      - name: Install npm CLI for trusted publishing
+        run: npm install --global npm@11.21.1
 
       # --------------------------------------------------------
       # 步骤 4：配置 Git 用户信息
@@ -132,7 +136,6 @@ jobs:
           fi
           npx lerna publish prerelease --yes --dist-tag alpha --preid alpha --no-push --message "chore(prerelease): publish [skip ci]"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
       # --------------------------------------------------------

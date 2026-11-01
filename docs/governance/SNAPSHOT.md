@@ -1,6 +1,6 @@
 # 治理组合快照
 
-> 文档定位：快照 · 适用于本仓领域组合；核验：2026-10-29。
+> 文档定位：快照 · 适用于本仓领域组合；运行时核验：2026-10-29；发布配置核验：2026-11-02。
 
 ## 领域摘要
 
@@ -14,6 +14,6 @@
 ## 全局技术基线
 
 - 根 ESLint / Prettier 配置供四包继承；lint-staged 仅匹配代码扩展名，Markdown 须独立检查。
-- Vite 为库产出 ESM、CJS，vite-plugin-dts 产出声明；已跟踪 release/prerelease 发布工作流，操作边界见 [R-REL 进度](schedule/t8el29-release-template-alignment/PROGRESS.md)。
+- Vite 为库产出 ESM、CJS，vite-plugin-dts 产出声明；本地 chore/npm-oidc-publishing 分支将 Lerna 固定为 9.0.7，保留两个 MR 合入发布入口，增加 npm 11.21.1 与 id-token: write，移除 NPM_TOKEN 发布注入；保留 Node 22、pnpm 10.33.0、[skip ci] 和 Git 回推逻辑。npm 可信发布者配置及远端生效状态见批次 o5mvzb 的 PROGRESS；本地配置不代表 request 已完成 OIDC MR 实发。
 - 鉴权、重试策略、提示渲染及缓存后端由调用方配置或宿主承担；当前实现不提供业务领域 verdict。
 - 日志为公共 debug 工具，缓存为注入接口；无数据库、部署或迁移约束。

@@ -1,6 +1,6 @@
 # 技术架构快照
 
-> 文档定位：快照 · 适用于整个请求 SDK；最后核验：2026-10-29（本批仅复核发布配置）。
+> 文档定位：快照 · 适用于整个请求 SDK；运行时快照核验：2026-10-29；发布配置核验：2026-11-02。
 
 ## ⓐ 系统上下文
 
@@ -12,7 +12,7 @@ TypeScript ^5.2.2、Vite ^5.0.10、Vitest ^1.1.1、vite-plugin-dts ^3.7.0；根 
 
 ## ⓒ 架构风格与模式
 
-pnpm workspace + Lerna monorepo；公共请求执行与传输适配分层，三个适配器通过公开包名导入 base。
+pnpm workspace + Lerna 9.0.7 monorepo（本地 chore/npm-oidc-publishing 分支）；公共请求执行与传输适配分层，三个适配器通过公开包名导入 base。
 
 ## ⓓ 模块/组件结构
 
@@ -40,7 +40,7 @@ base 的 test 脚本仅 echo，不能当独立单测通过；适配器 test 是�
 
 ## ⓙ 技术债务与风险
 
-仓库未锁定 packageManager 版本；发布 CI 的当前事实与操作边界见 [治理组合快照](governance/SNAPSHOT.md#全局技术基线)；本轮未安装依赖、未运行代码测试或构建。未发现标准错误对象的字段校验实现。
+仓库未锁定 packageManager 版本；发布 CI 的当前事实与操作边界见 [治理组合快照](governance/SNAPSHOT.md#全局技术基线)；本批已用 pnpm 10.33.0 安装依赖并通过四包构建及现有适配器 202 项测试；base test 仅 echo。request 的远端 OIDC MR 实发尚未验证。未发现标准错误对象的字段校验实现。
 
 ## ⓚ 开发工作流
 
