@@ -13,22 +13,22 @@ after: ""
 
 ## 目标与边界
 
-在 chore/npm-oidc-publishing 分支（基线 3556820）实施。功能配置仅改根 package.json、pnpm-lock.yaml、现有 release-publish.yml 和 prerelease-publish.yml；Lerna 固定 9.0.7，runner 安装 npm 11.21.1，增加 id-token: write，去掉 NODE_AUTH_TOKEN 的 NPM_TOKEN 注入。
+在 chore/npm-oidc-publishing 分支（基线 3556820）实施。功能配置仅改根 package.json、pnpm-lock.yaml 和发布工作流，两个工作流合并为单入口 oidc-release.yml；Lerna 固定 9.0.7，runner 安装 npm 11.21.1，增加 id-token: write，去掉 NODE_AUTH_TOKEN 的 NPM_TOKEN 注入。
 
 实际发包仅获授权 alpha；正式包必须取得用户明确授权，不触发 release 发布。push 每次另行授权。
 
-保留 Node 22、pnpm 10.33.0、[skip ci]、两个 MR closed + merged 入口、现有测试、版本策略、并发和 Git 回推逻辑、RELEASE_GITHUB_TOKEN。无新增 action、workflow、业务脚本、测试脚本或 job。Lerna 沿用 MIT 许可；不新增项目直接依赖。
+保留 Node 22、pnpm 10.33.0、[skip ci]、MR closed + merged 入口、现有测试、版本策略、并发和 Git 回推逻辑、RELEASE_GITHUB_TOKEN。无新增 action、业务脚本、测试脚本或 job。Lerna 沿用 MIT 许可；不新增项目直接依赖。
 
-四个 request 包各配置两个可信发布者：GitHub owner done-coding、repo done-coding-request，文件名 release-publish.yml / prerelease-publish.yml，Environment 留空，允许直接发布。先查再补，不删除既有信任或 Secret，不更改包级 2FA 策略。
+四个 request 包各配置一个可信发布者：GitHub owner done-coding、repo done-coding-request，文件名 oidc-release.yml，Environment 留空，允许直接发布。先查再补，不删除既有信任或 Secret，不更改包级 2FA 策略。
 
-共享骨架独占：package.json、pnpm-lock.yaml、.github/workflows/release-publish.yml、.github/workflows/prerelease-publish.yml。治理只记录本批及更新受影响技术快照和生成清单。
+共享骨架独占：package.json、pnpm-lock.yaml、.github/workflows/oidc-release.yml。治理只记录本批及更新受影响技术快照和生成清单。
 
 ## 完成标准
 
-ⓐ 四个功能文件仅含上述范围变更，成员包版本 / 源码 / 测试 / lerna.json 不变。
+ⓐ 功能文件仅含上述范围变更，lerna.json、成员包版本与测试不变；packages/base/src/index.ts 仅加一行注释，作为触发 alpha 发布所需的包内改动。
 ⓑ 固定 pnpm 生成锁文件，核对除 Lerna 外的 workspace 直接依赖未变；安装与四包构建检查通过，沿用既有测试命令，不新增测试。
-ⓒ 两个 YAML 的权限 / token 注入精确变化和 Bash 语法检查通过；MR、并发、版本命令和回推保持。
-ⓓ 八条信任配置精确匹配并记录管理 API 返回 ID；未使用正常 2FA 完成前不声称写入成功。
+ⓒ oidc-release.yml 与 test 仓云端已验证版本一致，YAML 与 Bash 语法检查通过；MR 入口、版本命令和回推保持，并发按目标分支隔离。
+ⓓ 四条信任配置精确匹配并记录返回 ID；未使用正常 2FA 完成前不声称写入成功。
 ⓔ 本地提交、治理 / 指令 / 格式检查通过；push 逐次单独授权，未实跑的 MR 发布明确保留未验证边界。
 
 ## 执行进度
@@ -46,6 +46,13 @@ after: ""
 - 首次 npm 管理接口双配置 POST 返回 E400，尚未产生信任记录；改为与官方 CLI 一致的每次单条配置请求，继续核验，不把尝试记作成功。
 - 本次 npm 管理操作复用已安装 npm 11.21.1 的官方 @npmcli/config、npm-profile、npm-registry-fetch 模块及 npm trust 相同接口；短期权限仅存内存，先读后补并回读，不写凭据进仓。管理接口请求返回 E400 / EOTP 后停止使用该临时 API 工具，改用官方 trust CLI；没有把失败尝试视为配置成功。CLI 源码为既有 npm 依赖，未引入项目依赖或复制进仓。
 - 官方依据：[npm Trusted publishing](https://docs.npmjs.com/trusted-publishers/) 与 [Lerna OIDC](https://lerna.js.org/docs/recipes/oidc-trusted-publishing)。实际账号与信任结果以管理接口回读为准。
+
+## 单入口改造（2026-11-04）
+
+test 仓已在云端跑通单入口预发与同分支正式（runs 41832775456、41833071453）。用户决定把该工作流移植到本仓，替换两个工作流，只保留 Lerna 升级、npm token 切 OIDC、双工作流合并三类改动。上文八条信任的计划作废；已写入的 request-base / prerelease-publish.yml 信任（67700897-8566-4aef-a3ed-f4432b647447）保留不动。
+
+- 本地验证：四包构建通过；axios 71、ofetch 64、uni 67 共 202 项测试通过；bare 仓 + 专用临时 verdaccio 执行工作流第 6～11 步的真实脚本，预发四包 1.3.1-alpha.0、正式四包 1.3.1，内部依赖与三分支同步符合预期。第 1～5 步与真实 OIDC 未在本地覆盖。
+- 未完成：push；四包登记 oidc-release.yml 信任；云端 alpha 实发。正式发布须用户明确授权。
 
 ## 快照替换记录
 

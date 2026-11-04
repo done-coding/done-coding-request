@@ -12,7 +12,7 @@ kind=http 表示非成功 HTTP，business 表示成功 HTTP 下业务失败，ne
 Request 合并全局与单次 uiConfig/cacheConfig，调用 issue；beforeError 可返回 reload 或新的错误与提示许可；缓存读取与写入由注入函数完成，retryable 本身不触发重试。
 测试沿用 Vitest/MSW，uni 原有集成测试使用 mock-uni-env/jsdom；共用矩阵位于 tests/standard-error-contract.ts（显式开启）与 tests/default-error-contract.ts（默认兼容）。204 项测试通过：base 2、Axios 71、ofetch 64、uni 67；旧源码 fb7514b 实跑确认默认矩阵中 66 项旧行为一致及两项已知 bug 修复差异。base 标准解析器另由 Axios 套件通过公开入口验证；四包 tsc（含 cause 必有属性结构赋值）、改动代码 ESLint 与 Lerna 四包构建通过。
 
-发布配置采用 template-hub monorepo 碎片：Lerna independent + pnpm + conventionalCommits；排除 Markdown 和指定测试路径，workspace 排除 uni_modules。release PR 合入触发稳定版发布，prerelease PR 合入发布 alpha；本地 chore/npm-oidc-publishing 分支采用 Lerna 9.0.7 与 npm 11.21.1，通过 id-token: write 申请 npm OIDC，移除 NPM_TOKEN 注入；保留 [skip ci]、版本策略与 Git 回推。四包构建和现有适配器测试 202 项通过（base test 仅 echo）；成员包仍为 1.3.0。npm 可信发布者进度见批次 o5mvzb 的 PROGRESS；尚未推送，request 的远端 OIDC MR 实发未验证。
+发布配置采用 template-hub monorepo 碎片：Lerna independent + pnpm + conventionalCommits；排除 Markdown 和指定测试路径，workspace 排除 uni_modules。release PR 合入触发稳定版发布，prerelease PR 合入发布 alpha；本地 chore/npm-oidc-publishing 分支采用 Lerna 9.0.7 与 npm 11.21.1，通过 id-token: write 申请 npm OIDC，移除 NPM_TOKEN 注入，两个发布工作流合并为单入口 oidc-release.yml，publish 拆为 version 与 from-package；保留 [skip ci]、版本策略与 Git 回推。四包构建和现有适配器测试 202 项通过（base test 仅 echo）；成员包仍为 1.3.0。npm 可信发布者进度见批次 o5mvzb 的 PROGRESS；尚未推送，request 的远端 OIDC MR 实发未验证。
 
 ## 业务快照
 
